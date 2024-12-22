@@ -6,10 +6,19 @@ import { GraphQLModule } from '@nestjs/graphql';
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { RestaurantsModule } from './restaurants/restaurants.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
   imports: [
-    RestaurantsModule,
+    ConfigModule.forRoot({
+      isGlobal: true,
+      envFilePath:
+        process.env.ENV === 'dev'
+          ? '.env.dev'
+          : process.env.ENV === 'test'
+            ? '.env.test'
+            : '.env.prod',
+    }),
     TypeOrmModule.forRoot({
       type: 'postgres',
       host: 'localhost',
@@ -25,6 +34,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
       //autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
       autoSchemaFile: true,
     }),
+    RestaurantsModule,
   ],
   controllers: [],
   providers: [],
