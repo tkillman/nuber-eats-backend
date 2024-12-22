@@ -12,20 +12,16 @@ import { ConfigModule } from '@nestjs/config';
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      envFilePath:
-        process.env.ENV === 'dev'
-          ? '.env.dev'
-          : process.env.ENV === 'test'
-            ? '.env.test'
-            : '.env.prod',
+      envFilePath: process.env.ENV === 'dev' ? '.env.dev' : '.env.test',
+      ignoreEnvFile: process.env.ENV === 'prod',
     }),
     TypeOrmModule.forRoot({
       type: 'postgres',
-      host: 'localhost',
-      port: 5432,
-      username: 'postgres',
-      password: 'a1234567!',
-      database: 'nuber',
+      host: process.env.DB_HOST,
+      port: Number(process.env.DB_PORT),
+      username: process.env.DB_USERNAME,
+      password: process.env.DB_PASSWORD,
+      database: process.env.DB_DATABASE,
       synchronize: true,
       logging: true,
     }),
