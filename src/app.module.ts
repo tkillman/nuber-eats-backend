@@ -1,4 +1,4 @@
-import { Module, Res } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 // import { AppController } from './app.controller';
 // import { AppService } from './app.service';
 import { GraphQLModule } from '@nestjs/graphql';
@@ -10,7 +10,6 @@ import { ConfigModule } from '@nestjs/config';
 import * as Joi from 'joi';
 import { Restaurant } from './restaurants/entities/restaurants.entity';
 
-console.log(Joi);
 @Module({
   imports: [
     ConfigModule.forRoot({

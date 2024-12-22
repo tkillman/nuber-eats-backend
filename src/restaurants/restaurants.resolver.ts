@@ -18,7 +18,7 @@ export class ResutaurantsResolver {
     // @Args('isVegan') isVegan: boolean,
     // @Args('address') address: string,
     // @Args('ownerName') ownerName: string,
-    @Args() createRestaurantInput: CreateRestaurantDto,
+    @Args('input') createRestaurantInput: CreateRestaurantDto,
   ): Promise<boolean> {
     console.log(createRestaurantInput);
     try {
@@ -28,6 +28,5 @@ export class ResutaurantsResolver {
       console.log(error);
       return false;
     }
-    return true;
   }
 }
