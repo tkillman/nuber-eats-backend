@@ -17,16 +17,11 @@ export class UsersResolver {
     @Args('input') createUserInput: CreateUserInput,
   ): Promise<CreateUserOutput> {
     try {
-      const error = await this.usersService.createUser(createUserInput);
-      if (error) {
-        return {
-          ok: false,
-          error,
-        };
-      }
+      const [ok, error] = await this.usersService.createUser(createUserInput);
 
       return {
-        ok: true,
+        ok,
+        error,
       };
     } catch (error) {
       return {

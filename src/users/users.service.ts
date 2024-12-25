@@ -14,7 +14,7 @@ export class UsersService {
     email,
     password,
     role,
-  }: CreateUserInput): Promise<string | void> {
+  }: CreateUserInput): Promise<[boolean, string?]> {
     // 유저 생성
 
     try {
@@ -23,14 +23,15 @@ export class UsersService {
       console.log('exists', exists);
       if (exists) {
         // 에러 발생
-        return '이미 존재하는 이메일입니다.';
+        return [false, '이미 존재하는 이메일입니다.'];
       }
 
       await this.users.save(this.users.create({ email, password, role }));
+      return [true];
     } catch (error) {
       // 에러 발생
       console.error(error);
-      return '계정을 생성할 수 없습니다.';
+      return [false, '계정을 생성할 수 없습니다.'];
     }
   }
 }
