@@ -15,3 +15,5 @@ https://orkhan.gitbook.io/typeorm/docs/decorator-reference#createdatecolumn
 # static module이란 설정이 없어서 forRoot 없음
 
 # dynamic module이란 설정이 있어서 forRoot 있음
+
+# Middlewares in NestJS 강의는 중요

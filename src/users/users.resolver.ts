@@ -31,4 +31,7 @@ export class UsersResolver {
   async login(@Args('input') loginInput: LoginInput): Promise<LoginOutput> {
     return await this.usersService.loginUser(loginInput);
   }
+
+  @Query(() => User)
+  me() {}
 }
