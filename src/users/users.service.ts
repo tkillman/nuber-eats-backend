@@ -2,7 +2,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from './entites/user.entity';
 import { Injectable } from '@nestjs/common';
-import { CreateUserInput } from './dtos/create-user.dto';
+import { CreateUserInput, CreateUserOutput } from './dtos/create-user.dto';
+import { LoginInput, LoginOutput } from './dtos/login.dto';
 
 @Injectable()
 export class UsersService {
@@ -14,7 +15,7 @@ export class UsersService {
     email,
     password,
     role,
-  }: CreateUserInput): Promise<[boolean, string?]> {
+  }: CreateUserInput): Promise<CreateUserOutput> {
     // 유저 생성
 
     try {
@@ -23,15 +24,48 @@ export class UsersService {
       console.log('exists', exists);
       if (exists) {
         // 에러 발생
-        return [false, '이미 존재하는 이메일입니다.'];
+        return { ok: false, error: '이미 존재하는 이메일입니다.' };
       }
 
       await this.users.save(this.users.create({ email, password, role }));
-      return [true];
+      return { ok: true };
     } catch (error) {
       // 에러 발생
       console.error(error);
-      return [false, '계정을 생성할 수 없습니다.'];
+      return { ok: false, error: '계정을 생성할 수 없습니다.' };
+    }
+  }
+
+  async loginUser({ email, password }: LoginInput): Promise<LoginOutput> {
+    // 유저 확인
+    // 패스워드 확인
+    try {
+      const user = await this.users.findOne({ where: { email } });
+      if (!user) {
+        return {
+          ok: false,
+          error: '유저를 찾을 수 없습니다.',
+        };
+      }
+      const isSamePw = await user.checkPassword(password);
+
+      if (!isSamePw) {
+        return {
+          ok: false,
+          error: '비밀번호가 일치하지 않습니다.',
+        };
+      }
+
+      return {
+        ok: true,
+        token: 'hihi',
+      };
+    } catch (error) {
+      console.error(error);
+      return {
+        ok: false,
+        error: '로그인 할 수 없습니다.',
+      };
     }
   }
 }
