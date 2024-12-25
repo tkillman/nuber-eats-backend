@@ -4,16 +4,16 @@ import { User } from './entites/user.entity';
 import { Injectable } from '@nestjs/common';
 import { CreateUserInput, CreateUserOutput } from './dtos/create-user.dto';
 import { LoginInput, LoginOutput } from './dtos/login.dto';
-import { ConfigService } from '@nestjs/config';
+// import { ConfigService } from '@nestjs/config';
 
-import * as jwt from 'jsonwebtoken';
+// import * as jwt from 'jsonwebtoken';
 import { JwtService } from 'src/jwt/jwt.service';
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectRepository(User) private readonly users: Repository<User>,
-    private readonly configService: ConfigService,
+    // private readonly configService: ConfigService,
     private readonly jwtService: JwtService,
   ) {
     console.log('UsersService created');
@@ -65,10 +65,11 @@ export class UsersService {
         };
       }
 
-      const token = jwt.sign(
-        { id: user.id },
-        this.configService.get('SECKRET_KEY'),
-      );
+      // const token = jwt.sign(
+      //   { id: user.id },
+      //   this.configService.get('SECKRET_KEY'),
+      // );
+      const token = this.jwtService.sign(user.id);
 
       return {
         ok: true,
