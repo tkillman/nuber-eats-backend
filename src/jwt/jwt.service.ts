@@ -19,4 +19,8 @@ export class JwtService {
     //return jwt.sign({ id }, this.configService.get('PRIVATE_KEY'));
     return jwt.sign({ id }, this.options.PRIVATE_KEY);
   }
+
+  verify(token: string) {
+    return jwt.verify(token, this.options.PRIVATE_KEY);
+  }
 }

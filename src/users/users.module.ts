@@ -10,5 +10,6 @@ import { UsersService } from './users.service';
   //imports: [TypeOrmModule.forFeature([User]), ConfigService],
   imports: [TypeOrmModule.forFeature([User])],
   providers: [UsersResolver, UsersService],
+  exports: [UsersService], // jwt.mddileware에서 사용하기 위해 export
 })
 export class UsersModule {}
