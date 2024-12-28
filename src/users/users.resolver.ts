@@ -5,6 +5,7 @@ import { CreateUserInput, CreateUserOutput } from './dtos/create-user.dto';
 import { LoginInput, LoginOutput } from './dtos/login.dto';
 import { UseGuards } from '@nestjs/common';
 import { AuthGuard } from 'src/auth/auth.guard';
+import { AuthUser } from 'src/auth/auth-user.decorator';
 
 @Resolver(() => User)
 export class UsersResolver {
@@ -34,13 +35,19 @@ export class UsersResolver {
     return await this.usersService.loginUser(loginInput);
   }
 
+  // @Query(() => User)
+  // @UseGuards(AuthGuard)
+  // me(@Context() context) {
+  //   console.log('context:', context);
+  //   if (!context.user) {
+  //     return;
+  //   }
+  //   return context.user;
+  // }
+
   @Query(() => User)
   @UseGuards(AuthGuard)
-  me(@Context() context) {
-    console.log('context:', context);
-    if (!context.user) {
-      return;
-    }
-    return context.user;
+  me(@AuthUser() user: User) {
+    return user;
   }
 }
