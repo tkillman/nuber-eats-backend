@@ -6,6 +6,7 @@ import { LoginInput, LoginOutput } from './dtos/login.dto';
 import { UseGuards } from '@nestjs/common';
 import { AuthGuard } from 'src/auth/auth.guard';
 import { AuthUser } from 'src/auth/auth-user.decorator';
+import { UserProfileInput, UserProfileOutput } from './dtos/user-profile.dto';
 
 @Resolver(() => User)
 export class UsersResolver {
@@ -49,5 +50,28 @@ export class UsersResolver {
   @UseGuards(AuthGuard)
   me(@AuthUser() user: User) {
     return user;
+  }
+
+  @Query(() => UserProfileOutput)
+  @UseGuards(AuthGuard)
+  async userProfile(
+    @Args() userProfileInput: UserProfileInput,
+  ): Promise<UserProfileOutput> {
+    console.log('userProfileInput', userProfileInput);
+    try {
+      const user = await this.usersService.findById(userProfileInput.userId);
+      if (!user) {
+        throw Error();
+      }
+      return {
+        ok: true,
+        user,
+      };
+    } catch (error) {
+      return {
+        ok: false,
+        error: error,
+      };
+    }
   }
 }
