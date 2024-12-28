@@ -60,7 +60,12 @@ export class UsersService {
     // 유저 확인
     // 패스워드 확인
     try {
-      const user = await this.users.findOne({ where: { email } });
+      // select: ['password']를 통해 password를 강제로 가져오게
+      // 패스워드가 select: false로 설정되어 있어서 기본적으로는 가져오지 않음
+      const user = await this.users.findOne({
+        where: { email },
+        select: ['id', 'password'],
+      });
       if (!user) {
         return {
           ok: false,
@@ -134,6 +139,9 @@ export class UsersService {
     if (verification) {
       console.log('verification', verification.user);
       verification.user.verified = true;
+      // 여기서 저장하다가 패스워드가 2번 해시화되는 오류 발생
+      // step1. @Column({ select: false })로 select 할 때 password를 제외
+      // step2. hashPassword 함수는 객체에 패스워드가 존재할때만
       this.users.save(verification.user);
       return true;
     }
