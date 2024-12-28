@@ -90,6 +90,24 @@ export class UsersService {
   }
 
   async editProfile(id: number, editProfileInput: EditProfileInput) {
-    return this.users.update({ id }, { ...editProfileInput });
+    // update는 객체 키가 존재하는지 확인하지 않고 바로 쿼리 업데이트를 수행
+    // 따라서 @BeforeUpdate() 데코레이터가 동작하지 않음
+    // 패스워드가 해시화되지 않고 그대로 저장됨.
+    //return this.users.update({ id }, { ...editProfileInput });
+
+    const user = await this.users.findOne({ where: { id } });
+    if (!user) {
+      return;
+    }
+
+    if (editProfileInput.email) {
+      user.email = editProfileInput.email;
+    }
+
+    if (editProfileInput.password) {
+      user.password = editProfileInput.password;
+    }
+
+    return this.users.save(user);
   }
 }
