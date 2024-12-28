@@ -8,6 +8,7 @@ import { LoginInput, LoginOutput } from './dtos/login.dto';
 
 // import * as jwt from 'jsonwebtoken';
 import { JwtService } from 'src/jwt/jwt.service';
+import { EditProfileInput } from './dtos/edit-pofile.dto';
 
 @Injectable()
 export class UsersService {
@@ -86,5 +87,9 @@ export class UsersService {
 
   async findById(id: number): Promise<User> {
     return this.users.findOne({ where: { id } });
+  }
+
+  async editProfile(id: number, editProfileInput: EditProfileInput) {
+    return this.users.update({ id }, { ...editProfileInput });
   }
 }
