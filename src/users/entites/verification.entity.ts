@@ -1,6 +1,7 @@
-import { Column, Entity, JoinColumn, OneToOne } from 'typeorm';
+import { BeforeInsert, Column, Entity, JoinColumn, OneToOne } from 'typeorm';
 import { User } from './user.entity';
 import { CoreEntity } from 'src/common/entities/core.entity';
+import { v4 } from 'uuid';
 
 @Entity()
 export class Verification extends CoreEntity {
@@ -10,4 +11,9 @@ export class Verification extends CoreEntity {
   @OneToOne(() => User)
   @JoinColumn()
   user: User;
+
+  @BeforeInsert()
+  createCode(): void {
+    this.code = v4();
+  }
 }

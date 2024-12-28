@@ -9,11 +9,14 @@ import { LoginInput, LoginOutput } from './dtos/login.dto';
 // import * as jwt from 'jsonwebtoken';
 import { JwtService } from 'src/jwt/jwt.service';
 import { EditProfileInput } from './dtos/edit-pofile.dto';
+import { Verification } from './entites/verification.entity';
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectRepository(User) private readonly users: Repository<User>,
+    @InjectRepository(Verification)
+    private readonly verifications: Repository<Verification>,
     // private readonly configService: ConfigService,
     private readonly jwtService: JwtService,
   ) {
@@ -37,7 +40,14 @@ export class UsersService {
         return { ok: false, error: '이미 존재하는 이메일입니다.' };
       }
 
-      await this.users.save(this.users.create({ email, password, role }));
+      const user = await this.users.save(
+        this.users.create({ email, password, role }),
+      );
+
+      this.verifications.save(
+        this.verifications.create({ user: user, code: '123' }),
+      );
+
       return { ok: true };
     } catch (error) {
       // 에러 발생
@@ -102,6 +112,8 @@ export class UsersService {
 
     if (editProfileInput.email) {
       user.email = editProfileInput.email;
+      user.verified = false;
+      this.verifications.save(this.verifications.create({ user: user }));
     }
 
     if (editProfileInput.password) {
