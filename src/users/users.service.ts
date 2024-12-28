@@ -1,7 +1,7 @@
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from './entites/user.entity';
-import { Injectable } from '@nestjs/common';
+import { Injectable, Query } from '@nestjs/common';
 import { CreateUserInput, CreateUserOutput } from './dtos/create-user.dto';
 import { LoginInput, LoginOutput } from './dtos/login.dto';
 // import { ConfigService } from '@nestjs/config';
@@ -121,5 +121,23 @@ export class UsersService {
     }
 
     return this.users.save(user);
+  }
+
+  async verifyEmail(code: string): Promise<boolean> {
+    //typeorm에서 relations는 객체 전체를 가져옴
+    // loadRelationIds는 해당 객체의 id만 가져옴
+    const verification = await this.verifications.findOneOrFail({
+      where: { code },
+      relations: ['user'],
+    });
+
+    if (verification) {
+      console.log('verification', verification.user);
+      verification.user.verified = true;
+      this.users.save(verification.user);
+      return true;
+    }
+
+    return false;
   }
 }
