@@ -143,6 +143,7 @@ export class UsersService {
       // step1. @Column({ select: false })로 select 할 때 password를 제외
       // step2. hashPassword 함수는 객체에 패스워드가 존재할때만
       this.users.save(verification.user);
+      this.verifications.delete(verification.id);
       return true;
     }
 
