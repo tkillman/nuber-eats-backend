@@ -6,13 +6,23 @@ import { Verification } from './entites/verification.entity';
 import { JwtService } from 'src/jwt/jwt.service';
 import { MailService } from 'src/mail/mail.service';
 import { Repository } from 'typeorm';
+import { CreateUserInput } from './dtos/create-user.dto';
+import exp from 'constants';
 
-const mockRepository = {
+// 객체로 사용해버리면 user와 verification이 같은 함수로 인식되어 버림
+// const mockRepository = {
+//   find: jest.fn(),
+//   findOne: jest.fn(),
+//   save: jest.fn(),
+//   create: jest.fn(),
+// };
+
+const mockRepository = () => ({
   find: jest.fn(),
   findOne: jest.fn(),
   save: jest.fn(),
   create: jest.fn(),
-};
+});
 
 const mockJwtService = {
   sayHello: jest.fn(),
@@ -37,11 +47,11 @@ describe('UserService', () => {
         UsersService,
         {
           provide: getRepositoryToken(User),
-          useValue: mockRepository,
+          useValue: mockRepository(),
         },
         {
           provide: getRepositoryToken(Verification),
-          useValue: mockRepository,
+          useValue: mockRepository(),
         },
         {
           provide: JwtService,
@@ -63,22 +73,38 @@ describe('UserService', () => {
   });
 
   describe('createUser', () => {
+    const createUserArgs: CreateUserInput = {
+      email: '',
+      password: '',
+      role: 0,
+    };
+
     it('유저가 있다면 실패해야함', async () => {
       usersRepository.findOne.mockResolvedValue({
         id: 1,
         email: '',
       });
 
-      const result = await service.createUser({
-        email: '',
-        password: '',
-        role: 0,
-      });
+      const result = await service.createUser(createUserArgs);
 
       expect(result).toMatchObject({
         ok: false,
         error: '이미 존재하는 이메일입니다.',
       });
+    });
+
+    it('유저가 없다면 성공해야함', async () => {
+      usersRepository.findOne.mockResolvedValue(undefined);
+      usersRepository.create.mockReturnValue(createUserArgs);
+
+      await service.createUser(createUserArgs);
+
+      // mockRepository를 객체로 사용하면
+      // user와 verification이 같은 함수로 인식되어 버림
+      expect(usersRepository.create).toHaveBeenCalledTimes(1);
+      expect(usersRepository.create).toHaveBeenCalledWith(createUserArgs);
+      expect(usersRepository.save).toHaveBeenCalledTimes(1);
+      expect(usersRepository.save).toHaveBeenCalledWith(createUserArgs);
     });
   });
 
