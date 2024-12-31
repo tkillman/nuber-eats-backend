@@ -7,6 +7,7 @@ import { JwtService } from 'src/jwt/jwt.service';
 import { MailService } from 'src/mail/mail.service';
 import { Repository } from 'typeorm';
 import { CreateUserInput } from './dtos/create-user.dto';
+import { LoginInput } from './dtos/login.dto';
 
 // 객체로 사용해버리면 user와 verification이 같은 함수로 인식되어 버림
 // const mockRepository = {
@@ -132,7 +133,40 @@ describe('UserService', () => {
 
       expect(result).toEqual({ ok: true });
     });
+
+    it('에러 발생시 생성실패', async () => {
+      usersRepository.findOne.mockRejectedValue(new Error());
+
+      const result = await service.createUser(createUserArgs);
+
+      expect(result).toEqual({
+        ok: false,
+        error: '계정을 생성할 수 없습니다.',
+      });
+    });
   });
 
-  it.todo('createUser');
+  describe('loginUser', () => {
+    const loginUserArgs: LoginInput = {
+      email: '',
+      password: '',
+    };
+
+    it('유저를 찾을 수 없다면 실패해야함', async () => {
+      usersRepository.findOne.mockResolvedValue(undefined);
+
+      const result = await service.loginUser(loginUserArgs);
+
+      expect(usersRepository.findOne).toHaveBeenCalledTimes(1);
+      expect(usersRepository.findOne).toHaveBeenCalledWith(
+        expect.any(Object),
+        expect.any(Object),
+      );
+
+      expect(result).toEqual({
+        ok: false,
+        error: '유저를 찾을 수 없습니다.',
+      });
+    });
+  });
 });
