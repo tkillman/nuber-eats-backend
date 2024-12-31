@@ -11,6 +11,7 @@ import { JwtService } from 'src/jwt/jwt.service';
 import { EditProfileInput } from './dtos/edit-pofile.dto';
 import { Verification } from './entites/verification.entity';
 import { MailService } from 'src/mail/mail.service';
+import { UserProfileOutput } from './dtos/user-profile.dto';
 
 @Injectable()
 export class UsersService {
@@ -103,8 +104,19 @@ export class UsersService {
     }
   }
 
-  async findById(id: number): Promise<User> {
-    return this.users.findOne({ where: { id } });
+  async findById(id: number): Promise<UserProfileOutput> {
+    try {
+      const user = await this.users.findOneOrFail({ where: { id } });
+      return {
+        ok: true,
+        user,
+      };
+    } catch (error) {
+      return {
+        ok: false,
+        error: '유저를 찾을 수 없습니다.',
+      };
+    }
   }
 
   async editProfile(id: number, editProfileInput: EditProfileInput) {
