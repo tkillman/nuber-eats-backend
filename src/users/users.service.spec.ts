@@ -7,7 +7,6 @@ import { JwtService } from 'src/jwt/jwt.service';
 import { MailService } from 'src/mail/mail.service';
 import { Repository } from 'typeorm';
 import { CreateUserInput } from './dtos/create-user.dto';
-import exp from 'constants';
 
 // 객체로 사용해버리면 user와 verification이 같은 함수로 인식되어 버림
 // const mockRepository = {
@@ -40,6 +39,8 @@ describe('UserService', () => {
   let service: UsersService;
   //let usersRepository: Partial<Record<'hello', number>>;
   let usersRepository: MockRepository<User>;
+  let verificationRepository: MockRepository<Verification>;
+  let mailService: MailService;
 
   beforeAll(async () => {
     const module = await Test.createTestingModule({
@@ -66,6 +67,8 @@ describe('UserService', () => {
 
     service = module.get<UsersService>(UsersService);
     usersRepository = module.get(getRepositoryToken(User));
+    verificationRepository = module.get(getRepositoryToken(Verification));
+    mailService = module.get<MailService>(MailService);
   });
 
   it('정의됐는지 확인', () => {
@@ -96,8 +99,14 @@ describe('UserService', () => {
     it('유저가 없다면 성공해야함', async () => {
       usersRepository.findOne.mockResolvedValue(undefined);
       usersRepository.create.mockReturnValue(createUserArgs);
+      usersRepository.save.mockResolvedValue(createUserArgs);
+      verificationRepository.create.mockReturnValue({ user: createUserArgs });
+      verificationRepository.save.mockResolvedValue({
+        user: createUserArgs,
+        code: 'code',
+      });
 
-      await service.createUser(createUserArgs);
+      const result = await service.createUser(createUserArgs);
 
       // mockRepository를 객체로 사용하면
       // user와 verification이 같은 함수로 인식되어 버림
@@ -105,6 +114,23 @@ describe('UserService', () => {
       expect(usersRepository.create).toHaveBeenCalledWith(createUserArgs);
       expect(usersRepository.save).toHaveBeenCalledTimes(1);
       expect(usersRepository.save).toHaveBeenCalledWith(createUserArgs);
+
+      expect(verificationRepository.create).toHaveBeenCalledTimes(1);
+      expect(verificationRepository.create).toHaveBeenCalledWith({
+        user: createUserArgs,
+      });
+
+      expect(verificationRepository.save).toHaveBeenCalledTimes(1);
+      expect(verificationRepository.save).toHaveBeenCalledWith({
+        user: createUserArgs,
+      });
+      expect(mailService.sendVerificationEmail).toHaveBeenCalledTimes(1);
+      expect(mailService.sendVerificationEmail).toHaveBeenCalledWith(
+        expect.any(String),
+        expect.any(String),
+      );
+
+      expect(result).toEqual({ ok: true });
     });
   });
 
