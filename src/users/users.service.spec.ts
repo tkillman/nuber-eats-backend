@@ -62,5 +62,25 @@ describe('UserService', () => {
     expect(service).toBeDefined();
   });
 
+  describe('createUser', () => {
+    it('유저가 있다면 실패해야함', async () => {
+      usersRepository.findOne.mockResolvedValue({
+        id: 1,
+        email: '',
+      });
+
+      const result = await service.createUser({
+        email: '',
+        password: '',
+        role: 0,
+      });
+
+      expect(result).toMatchObject({
+        ok: false,
+        error: '이미 존재하는 이메일입니다.',
+      });
+    });
+  });
+
   it.todo('createUser');
 });
