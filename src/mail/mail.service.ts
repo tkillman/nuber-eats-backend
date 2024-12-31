@@ -24,6 +24,9 @@ export class MailService {
     form.append('to', 'timekillman@gmail.com');
     form.append('subject', subject);
     form.append('text', content);
+    form.append('template', 'verify-email');
+    form.append('v:code', '1234');
+    form.append('v:userName', 'nico');
     console.log(form);
     try {
       const response = await axios.post(
