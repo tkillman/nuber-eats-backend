@@ -4,12 +4,12 @@ import { User } from '../entites/user.entity';
 
 @ArgsType()
 export class UserProfileInput {
-  @Field((type) => Number)
+  @Field(() => Number)
   userId: number;
 }
 
 @ObjectType()
 export class UserProfileOutput extends MutationOutput {
-  @Field((type) => User, { nullable: true })
+  @Field(() => User, { nullable: true })
   user?: User;
 }

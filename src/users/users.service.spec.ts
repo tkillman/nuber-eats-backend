@@ -31,9 +31,9 @@ const mockJwtService = {
   verify: jest.fn(),
 };
 
-const mockMailService = {
+const mockMailService = () => ({
   sendVerificationEmail: jest.fn(),
-};
+});
 
 type MockRepository<T = any> = Partial<Record<keyof Repository<T>, jest.Mock>>;
 
@@ -64,7 +64,7 @@ describe('UserService', () => {
         },
         {
           provide: MailService,
-          useValue: mockMailService,
+          useValue: mockMailService(),
         },
       ],
     }).compile();
@@ -223,6 +223,63 @@ describe('UserService', () => {
         ok: false,
         error: '유저를 찾을 수 없습니다.',
       });
+    });
+  });
+
+  describe('editProfile', () => {
+    const editProfileInput = {
+      email: 'test',
+    };
+
+    it('[실패]유저없음', async () => {
+      usersRepository.findOne.mockResolvedValue(undefined);
+
+      const result = await service.editProfile(1, editProfileInput);
+      console.log('result', result);
+      expect(result).toEqual(undefined);
+    });
+
+    it('[성공]', async () => {
+      const oldUser = {
+        email: 'old',
+        verified: true,
+      };
+
+      const newUser = {
+        ...oldUser,
+        email: editProfileInput.email,
+        verified: false,
+      };
+
+      const verification = {
+        code: 'code',
+        user: newUser,
+      };
+
+      usersRepository.findOne.mockResolvedValue(oldUser);
+      verificationRepository.create.mockReturnValue(verification);
+      verificationRepository.save.mockResolvedValue(verification);
+
+      const result = await service.editProfile(1, editProfileInput);
+
+      expect(usersRepository.findOne).toHaveBeenCalledTimes(1);
+      expect(usersRepository.findOne).toHaveBeenCalledWith(expect.any(Object));
+
+      expect(verificationRepository.create).toHaveBeenCalledTimes(1);
+      expect(verificationRepository.create).toHaveBeenCalledWith({
+        user: newUser,
+      });
+
+      expect(verificationRepository.save).toHaveBeenCalledTimes(1);
+      expect(verificationRepository.save).toHaveBeenCalledWith(verification);
+
+      expect(mailService.sendVerificationEmail).toHaveBeenCalledTimes(1);
+      expect(mailService.sendVerificationEmail).toHaveBeenCalledWith(
+        newUser.email,
+        verification.code,
+      );
+
+      //expect(result).toEqual({ ok: true });
     });
   });
 });

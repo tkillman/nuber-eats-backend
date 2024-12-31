@@ -112,6 +112,7 @@ export class UsersService {
         user,
       };
     } catch (error) {
+      console.error(error);
       return {
         ok: false,
         error: '유저를 찾을 수 없습니다.',
