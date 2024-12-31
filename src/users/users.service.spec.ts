@@ -26,7 +26,7 @@ const mockRepository = () => ({
 
 const mockJwtService = {
   sayHello: jest.fn(),
-  sign: jest.fn(),
+  sign: jest.fn(() => 'signed-token-baby'),
   verify: jest.fn(),
 };
 
@@ -42,8 +42,10 @@ describe('UserService', () => {
   let usersRepository: MockRepository<User>;
   let verificationRepository: MockRepository<Verification>;
   let mailService: MailService;
+  let jwtService: JwtService;
 
-  beforeAll(async () => {
+  //beforeAll을 쓰면 toHaveBeenCalledTimes가 공유되버린다.
+  beforeEach(async () => {
     const module = await Test.createTestingModule({
       providers: [
         UsersService,
@@ -70,6 +72,7 @@ describe('UserService', () => {
     usersRepository = module.get(getRepositoryToken(User));
     verificationRepository = module.get(getRepositoryToken(Verification));
     mailService = module.get<MailService>(MailService);
+    jwtService = module.get<JwtService>(JwtService);
   });
 
   it('정의됐는지 확인', () => {
@@ -83,7 +86,7 @@ describe('UserService', () => {
       role: 0,
     };
 
-    it('유저가 있다면 실패해야함', async () => {
+    it('[실패]유저존재', async () => {
       usersRepository.findOne.mockResolvedValue({
         id: 1,
         email: '',
@@ -97,7 +100,7 @@ describe('UserService', () => {
       });
     });
 
-    it('유저가 없다면 성공해야함', async () => {
+    it('[성공]', async () => {
       usersRepository.findOne.mockResolvedValue(undefined);
       usersRepository.create.mockReturnValue(createUserArgs);
       usersRepository.save.mockResolvedValue(createUserArgs);
@@ -134,7 +137,7 @@ describe('UserService', () => {
       expect(result).toEqual({ ok: true });
     });
 
-    it('에러 발생시 생성실패', async () => {
+    it('[실패]에러발생', async () => {
       usersRepository.findOne.mockRejectedValue(new Error());
 
       const result = await service.createUser(createUserArgs);
@@ -152,20 +155,50 @@ describe('UserService', () => {
       password: '',
     };
 
-    it('유저를 찾을 수 없다면 실패해야함', async () => {
+    it('[실패]유저없음', async () => {
       usersRepository.findOne.mockResolvedValue(undefined);
 
       const result = await service.loginUser(loginUserArgs);
 
       expect(usersRepository.findOne).toHaveBeenCalledTimes(1);
-      expect(usersRepository.findOne).toHaveBeenCalledWith(
-        expect.any(Object),
-        expect.any(Object),
-      );
+      expect(usersRepository.findOne).toHaveBeenCalledWith(expect.any(Object));
 
       expect(result).toEqual({
         ok: false,
         error: '유저를 찾을 수 없습니다.',
+      });
+    });
+
+    it('[실패]비밀번호 불일치', async () => {
+      const mockedUser = {
+        id: 1,
+        checkPassword: jest.fn(() => Promise.resolve(false)),
+      };
+
+      usersRepository.findOne.mockResolvedValue(mockedUser);
+
+      const result = await service.loginUser(loginUserArgs);
+
+      expect(result).toEqual({
+        ok: false,
+        error: '비밀번호가 일치하지 않습니다.',
+      });
+    });
+
+    it('[성공]', async () => {
+      const mockedUser = {
+        id: 1,
+        checkPassword: jest.fn(() => Promise.resolve(true)),
+      };
+
+      usersRepository.findOne.mockResolvedValue(mockedUser);
+      const result = await service.loginUser(loginUserArgs);
+      expect(jwtService.sign).toHaveBeenCalledTimes(1);
+      expect(jwtService.sign).toHaveBeenCalledWith(expect.any(Number));
+
+      expect(result).toEqual({
+        ok: true,
+        token: 'signed-token-baby',
       });
     });
   });
