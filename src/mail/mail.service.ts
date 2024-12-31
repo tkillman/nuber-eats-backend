@@ -1,5 +1,5 @@
 import { CONFIG_OPTIONS } from 'src/common/common.constant';
-import { MailModuleOptions } from './mail.interface';
+import { EmailTemplate, MailModuleOptions } from './mail.interface';
 import { Inject, Injectable } from '@nestjs/common';
 import axios from 'axios';
 import * as FormData from 'form-data';
@@ -10,11 +10,14 @@ export class MailService {
     @Inject(CONFIG_OPTIONS) private readonly options: MailModuleOptions,
   ) {
     console.log('MailService created', options);
-    this.sendEmail('test', 'test11');
   }
 
-  private async sendEmail(subject: string, content: string) {
-    console.log('Send email o', subject, content);
+  private async sendEmail(param: {
+    subject: string;
+    to: string;
+    template: EmailTemplate;
+    emailVars: { [key: string]: string }[];
+  }) {
     const form = new FormData();
     form.append('from', `Excited User <mailgun@${this.options.domain}>`);
     // form.append(
@@ -22,11 +25,13 @@ export class MailService {
     //   'YOU@sandbox4e384cd510f54f65a5780bc94d05856e.mailgun.org',
     // );
     form.append('to', 'timekillman@gmail.com');
-    form.append('subject', subject);
-    form.append('text', content);
-    form.append('template', 'verify-email');
-    form.append('v:code', '1234');
-    form.append('v:userName', 'nico');
+    form.append('subject', param.subject);
+    //form.append('text', content);
+    form.append('template', param.template);
+    param.emailVars.forEach((emailVar) => {
+      form.append(`v:${emailVar.key}`, emailVar.value);
+    });
+
     console.log(form);
     try {
       const response = await axios.post(
@@ -44,5 +49,17 @@ export class MailService {
     } catch (error) {
       console.error(error);
     }
+  }
+
+  async sendVerificationEmail(email: string, code: string) {
+    this.sendEmail({
+      subject: 'Verify Your Email',
+      to: email,
+      template: EmailTemplate.VERIFY_EMAIL,
+      emailVars: [
+        { key: 'code', value: code },
+        { key: 'userName', value: email },
+      ],
+    });
   }
 }

@@ -10,6 +10,7 @@ import { LoginInput, LoginOutput } from './dtos/login.dto';
 import { JwtService } from 'src/jwt/jwt.service';
 import { EditProfileInput } from './dtos/edit-pofile.dto';
 import { Verification } from './entites/verification.entity';
+import { MailService } from 'src/mail/mail.service';
 
 @Injectable()
 export class UsersService {
@@ -19,6 +20,7 @@ export class UsersService {
     private readonly verifications: Repository<Verification>,
     // private readonly configService: ConfigService,
     private readonly jwtService: JwtService,
+    private readonly mailService: MailService,
   ) {
     console.log('UsersService created');
     this.jwtService.sayHello();
@@ -44,9 +46,11 @@ export class UsersService {
         this.users.create({ email, password, role }),
       );
 
-      this.verifications.save(
-        this.verifications.create({ user: user, code: '123' }),
+      const verification = await this.verifications.save(
+        this.verifications.create({ user: user }),
       );
+
+      this.mailService.sendVerificationEmail(user.email, verification.code);
 
       return { ok: true };
     } catch (error) {
@@ -118,7 +122,11 @@ export class UsersService {
     if (editProfileInput.email) {
       user.email = editProfileInput.email;
       user.verified = false;
-      this.verifications.save(this.verifications.create({ user: user }));
+      const verification = await this.verifications.save(
+        this.verifications.create({ user: user }),
+      );
+
+      this.mailService.sendVerificationEmail(user.email, verification.code);
     }
 
     if (editProfileInput.password) {
