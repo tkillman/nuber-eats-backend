@@ -51,6 +51,8 @@ export class UsersResolver {
   @Query(() => User)
   @UseGuards(AuthGuard)
   me(@AuthUser() user: User) {
+    console.log('🚀 ~ UsersResolver ~ me ~ user:', user);
+
     return user;
   }
 

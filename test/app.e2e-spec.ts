@@ -230,4 +230,47 @@ describe('AppController (e2e)', () => {
         });
     });
   });
+
+  describe('me', () => {
+    it('[성공] 내 정보 조회', () => {
+      return request(app.getHttpServer())
+        .post(GRAPHQL_ENDPOINT)
+        .set('X-JWT', `${jwtToken}`)
+        .send({
+          query: `
+            query {
+              me{
+                id
+                email
+              }
+            }
+        `,
+        })
+        .expect(200)
+        .expect((res) => {
+          console.log('🚀 ~ .expect ~ res.body.data', res.body.data);
+          expect(res.body.data.me.email).toEqual(testUser.email);
+        });
+    });
+
+    it('[실패] 내 정보 조회', () => {
+      return request(app.getHttpServer())
+        .post(GRAPHQL_ENDPOINT)
+        .send({
+          query: `
+            query {
+              me{
+                id
+                email
+              }
+            }
+        `,
+        })
+        .expect(200)
+        .expect((res) => {
+          console.log('🚀 ~ .expect ~ res.body.data', res.body.data);
+          expect(res.body.errors[0].message).toEqual('Forbidden resource');
+        });
+    });
+  });
 });
