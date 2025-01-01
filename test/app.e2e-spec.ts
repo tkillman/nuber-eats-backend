@@ -273,4 +273,49 @@ describe('AppController (e2e)', () => {
         });
     });
   });
+
+  describe('editProfile', () => {
+    const newEmail = 'dkkim1004@hanmail.net';
+    it('[성공] 프로필 수정', () => {
+      return request(app.getHttpServer())
+        .post(GRAPHQL_ENDPOINT)
+        .set('X-JWT', `${jwtToken}`)
+        .send({
+          query: `
+            mutation {
+              editProfile(input :{
+                email : "${newEmail}",
+                password : "1234"
+              }){
+                ok
+                error
+              }
+            }
+          `,
+        })
+        .expect(200)
+        .expect((res) => {
+          expect(res.body.data.editProfile.ok).toEqual(true);
+          expect(res.body.data.editProfile.error).toEqual(null);
+        });
+    });
+    it('바뀐 이메일 확인', () => {
+      return request(app.getHttpServer())
+        .post(GRAPHQL_ENDPOINT)
+        .set('X-JWT', `${jwtToken}`)
+        .send({
+          query: `
+            query {
+              me{
+                email
+              }
+            }
+          `,
+        })
+        .expect(200)
+        .expect((res) => {
+          expect(res.body.data.me.email).toEqual(newEmail);
+        });
+    });
+  });
 });

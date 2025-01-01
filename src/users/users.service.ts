@@ -132,12 +132,14 @@ export class UsersService {
       user.email = editProfileInput.email;
       user.verified = false;
 
+      await this.verifications.delete({ user: { id: user.id } });
+
       const newVerification = this.verifications.create({
         user: {
           id: user.id,
         },
       });
-      console.log('newVerification', newVerification);
+
       const verification = await this.verifications.save(newVerification);
 
       await this.mailService.sendVerificationEmail(

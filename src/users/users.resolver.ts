@@ -76,6 +76,8 @@ export class UsersResolver {
         ok: true,
       };
     } catch (error) {
+      console.log('🚀 ~ UsersResolver ~ error:', error);
+
       return {
         ok: false,
         error: error,
