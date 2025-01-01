@@ -5,6 +5,7 @@ import { AppModule } from './../src/app.module';
 import { DataSource, getConnection, Repository } from 'typeorm';
 import { User } from 'src/users/entites/user.entity';
 import { getRepositoryToken } from '@nestjs/typeorm';
+import { Verification } from 'src/users/entites/verification.entity';
 
 jest.mock('axios');
 
@@ -20,6 +21,7 @@ describe('AppController (e2e)', () => {
   let dataSource: DataSource; /* 추가된 코드 */
   let jwtToken: string;
   let userRepositry: Repository<User>;
+  let verificationRepository: Repository<Verification>;
 
   beforeAll(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -29,6 +31,7 @@ describe('AppController (e2e)', () => {
     app = module.createNestApplication();
     dataSource = module.get(DataSource); /* 추가된 코드 */
     userRepositry = module.get(getRepositoryToken(User));
+    verificationRepository = module.get(getRepositoryToken(Verification));
     await app.init();
   });
 
@@ -315,6 +318,58 @@ describe('AppController (e2e)', () => {
         .expect(200)
         .expect((res) => {
           expect(res.body.data.me.email).toEqual(newEmail);
+        });
+    });
+  });
+
+  describe('verifyEmail', () => {
+    let verifications: Verification[];
+    beforeAll(async () => {
+      verifications = await verificationRepository.find();
+      console.log('🚀 ~ beforeAll ~ verifications:', verifications);
+    });
+
+    it('[성공] 이메일 인증', () => {
+      return request(app.getHttpServer())
+        .post(GRAPHQL_ENDPOINT)
+        .set('X-JWT', `${jwtToken}`)
+        .send({
+          query: `
+            mutation {
+              verifyEmail(input : {
+                code : "${verifications[0].code}"
+                }
+              ){
+                ok
+              }
+            }
+          `,
+        })
+        .expect(200)
+        .expect((res) => {
+          expect(res.body.data.verifyEmail.ok).toEqual(true);
+        });
+    });
+
+    it('[실패] 이메일 인증', () => {
+      return request(app.getHttpServer())
+        .post(GRAPHQL_ENDPOINT)
+        .set('X-JWT', `${jwtToken}`)
+        .send({
+          query: `
+            mutation {
+              verifyEmail(input : {
+                code : "${verifications[0].code}"
+                }
+              ){
+                ok
+              }
+            }
+          `,
+        })
+        .expect(200)
+        .expect((res) => {
+          expect(res.body.data.verifyEmail.ok).toEqual(false);
         });
     });
   });

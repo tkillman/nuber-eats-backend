@@ -165,19 +165,18 @@ export class UsersService {
       });
 
       if (verification) {
-        console.log('verification', verification.user);
         verification.user.verified = true;
         // 여기서 저장하다가 패스워드가 2번 해시화되는 오류 발생
         // step1. @Column({ select: false })로 select 할 때 password를 제외
         // step2. hashPassword 함수는 객체에 패스워드가 존재할때만
-        this.users.save(verification.user);
-        this.verifications.delete(verification.id);
+        await this.users.save(verification.user);
+        await this.verifications.delete(verification.id);
         return true;
       }
 
       return false;
     } catch (error) {
-      //console.error(error);
+      console.error(error);
       //console.error('verifyEmail error', error?.message);
       return false;
     }

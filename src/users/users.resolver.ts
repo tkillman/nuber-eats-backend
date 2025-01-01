@@ -86,7 +86,12 @@ export class UsersResolver {
   }
 
   @Mutation(() => VerifyEmailOutput)
-  async verifyEmail(@Args('input') verifyEmailInput: VerifyEmailInput) {
-    return await this.usersService.verifyEmail(verifyEmailInput.code);
+  async verifyEmail(
+    @Args('input') verifyEmailInput: VerifyEmailInput,
+  ): Promise<VerifyEmailOutput> {
+    const result = await this.usersService.verifyEmail(verifyEmailInput.code);
+    return {
+      ok: result,
+    };
   }
 }
