@@ -8,9 +8,15 @@ jest.mock('axios');
 
 const GRAPHQL_ENDPOINT = '/graphql';
 
+const testUser = {
+  email: 'timekillman@gmail.com',
+  password: '1234',
+};
+
 describe('AppController (e2e)', () => {
   let app: INestApplication;
   let dataSource: DataSource; /* 추가된 코드 */
+  let jwtToken: string;
 
   beforeAll(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -28,8 +34,6 @@ describe('AppController (e2e)', () => {
   });
 
   describe('createUser', () => {
-    const email = 'timekillman@gmail.com';
-
     it('유저생성', async () => {
       return request(app.getHttpServer())
         .post(GRAPHQL_ENDPOINT)
@@ -37,8 +41,8 @@ describe('AppController (e2e)', () => {
           query: `
             mutation {
               createUser(input : {
-                email : "${email}",
-                password : "1234",
+                email : "${testUser.email}",
+                password : "${testUser.password}",
                 role : Client
               }){
                 error
@@ -51,6 +55,7 @@ describe('AppController (e2e)', () => {
         .expect((res) => {
           console.log('🚀 ~ .expect ~ res:', res.body.data);
           expect(res.body.data.createUser.ok).toEqual(true);
+          expect(res.body.data.createUser.error).toEqual(null);
         });
     });
 
@@ -61,8 +66,8 @@ describe('AppController (e2e)', () => {
           query: `
             mutation {
               createUser(input : {
-                email : "${email}",
-                password : "1234",
+                email : "${testUser.email}",
+                password : "${testUser.password}",
                 role : Client
               }){
                 error
@@ -75,6 +80,142 @@ describe('AppController (e2e)', () => {
         .expect((res) => {
           expect(res.body.data.createUser.ok).toEqual(false);
           expect(res.body.data.createUser.error).toEqual(expect.any(String));
+        });
+    });
+  });
+
+  describe('login', () => {
+    it('[성공] 로그인', () => {
+      return request(app.getHttpServer())
+        .post(GRAPHQL_ENDPOINT)
+        .send({
+          query: `
+            mutation {
+              login(input : {
+                email : "${testUser.email}",
+                password : "${testUser.password}"
+              }){
+                error
+                ok
+                token
+              }
+            }
+        `,
+        })
+        .expect(200)
+        .expect((res) => {
+          console.log('🚀 ~ .expect ~ res.body.data', res.body.data);
+          expect(res.body.data.login.ok).toEqual(true);
+          expect(res.body.data.login.error).toEqual(null);
+          expect(res.body.data.login.token).toEqual(expect.any(String));
+          jwtToken = res.body.data.login.token;
+        });
+    });
+
+    it('[실패] 유저 없음', () => {
+      return request(app.getHttpServer())
+        .post(GRAPHQL_ENDPOINT)
+        .send({
+          query: `
+            mutation {
+              login(input : {
+                email : "${testUser.email}123",
+                password : "${testUser.password}"
+              }){
+                error
+                ok
+                token
+              }
+            }
+        `,
+        })
+        .expect(200)
+        .expect((res) => {
+          console.log('🚀 ~ .expect ~ res.body.data', res.body.data);
+          expect(res.body.data.login.ok).toEqual(false);
+          expect(res.body.data.login.error).toEqual(expect.any(String));
+          expect(res.body.data.login.token).toEqual(null);
+        });
+    });
+    it('[실패] 비밀번호 틀림', () => {
+      return request(app.getHttpServer())
+        .post(GRAPHQL_ENDPOINT)
+        .send({
+          query: `
+            mutation {
+              login(input : {
+                email : "${testUser.email}",
+                password : "${testUser.password}123"
+              }){
+                error
+                ok
+                token
+              }
+            }
+        `,
+        })
+        .expect(200)
+        .expect((res) => {
+          console.log('🚀 ~ .expect ~ res.body.data', res.body.data);
+          expect(res.body.data.login.ok).toEqual(false);
+          expect(res.body.data.login.error).toEqual(expect.any(String));
+          expect(res.body.data.login.token).toEqual(null);
+        });
+    });
+  });
+
+  describe('userProfile', () => {
+    it('[성공] 유저 프로필 조회', () => {
+      return request(app.getHttpServer())
+        .post(GRAPHQL_ENDPOINT)
+        .set('Authorization', `Bearer ${jwtToken}`)
+        .send({
+          query: `
+            query {
+              userProfile(userId : 1){
+                error
+                ok
+                user {
+                  id
+                  email
+                }
+              }
+            }
+        `,
+        })
+        .expect(200)
+        .expect((res) => {
+          console.log('🚀 ~ .expect ~ res.body.data', res.body.data);
+          expect(res.body.data.userProfile.ok).toEqual(true);
+          expect(res.body.data.userProfile.error).toEqual(null);
+          expect(res.body.data.userProfile.user.email).toEqual(testUser.email);
+        });
+    });
+
+    it('[실패] 유저 프로필 조회', () => {
+      return request(app.getHttpServer())
+        .post(GRAPHQL_ENDPOINT)
+        .set('Authorization', `Bearer ${jwtToken}`)
+        .send({
+          query: `
+            query {
+              userProfile(userId : 2){
+                error
+                ok
+                user {
+                  id
+                  email
+                }
+              }
+            }
+        `,
+        })
+        .expect(200)
+        .expect((res) => {
+          console.log('🚀 ~ .expect ~ res.body.data', res.body.data);
+          expect(res.body.data.userProfile.ok).toEqual(false);
+          expect(res.body.data.userProfile.error).toEqual(expect.any(String));
+          expect(res.body.data.userProfile.user).toEqual(null);
         });
     });
   });
