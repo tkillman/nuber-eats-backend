@@ -12,7 +12,7 @@ export class MailService {
     console.log('MailService created', options);
   }
 
-  private async sendEmail(param: {
+  async sendEmail(param: {
     subject: string;
     to: string;
     template: EmailTemplate;
@@ -47,7 +47,7 @@ export class MailService {
       );
       console.log('response', response.data);
     } catch (error) {
-      console.error(error?.message);
+      //console.error(error?.message);
     }
   }
 
