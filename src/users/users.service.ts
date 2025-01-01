@@ -33,7 +33,7 @@ export class UsersService {
     try {
       // 이메일 중복확인
       const exists = await this.users.findOne({ where: { email: email } });
-      console.log('exists', exists);
+
       if (exists) {
         // 에러 발생
         return { ok: false, error: '이미 존재하는 이메일입니다.' };

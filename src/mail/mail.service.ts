@@ -44,7 +44,7 @@ export class MailService {
           },
         },
       );
-      console.log('response', response.data);
+
       return true;
     } catch (error) {
       //console.error(error?.message);
