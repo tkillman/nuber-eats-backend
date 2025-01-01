@@ -1,4 +1,4 @@
-import { Field, ObjectType } from '@nestjs/graphql';
+import { Field, InputType, ObjectType } from '@nestjs/graphql';
 import { IsBoolean, IsOptional, IsString, Length } from 'class-validator';
 import { CoreEntity } from 'src/common/entities/core.entity';
 import {
@@ -13,6 +13,7 @@ import { Restaurant } from './restaurants.entity';
 // ObjectType, Field 는 그래프큐엘용도
 // Entity, Column 은 TypeORM용도
 
+@InputType('CategoryInputType', { isAbstract: true })
 @ObjectType()
 @Entity()
 export class Category extends CoreEntity {
