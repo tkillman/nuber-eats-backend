@@ -2,20 +2,12 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { MailService } from './mail.service';
 import { EmailTemplate, MailModuleOptions } from './mail.interface';
 import { CONFIG_OPTIONS } from 'src/common/common.constant';
+import * as FormData from 'form-data';
+import axios from 'axios';
 
-jest.mock('axios', () => {
-  return {
-    create: jest.fn(() => ({
-      post: jest.fn(() => Promise.resolve({ status: 200 })),
-    })),
-  };
-});
+jest.mock('axios');
 
-jest.mock('form-data', () => {
-  return jest.fn(() => ({
-    append: jest.fn(),
-  }));
-});
+jest.mock('form-data');
 
 const options: MailModuleOptions = {
   apiKey: '',
@@ -53,6 +45,7 @@ describe('MailService', () => {
       // service.sendEmail = jest.fn();
       jest.spyOn(service, 'sendEmail').mockImplementation(async () => {
         console.log('i love u');
+        return true;
       });
 
       const result = await service.sendVerificationEmail('email', 'code');
@@ -68,5 +61,53 @@ describe('MailService', () => {
       });
     });
   });
-  it.todo('sendVerificationEmail');
+
+  describe('sendEmail', () => {
+    it('[성공]', async () => {
+      jest.spyOn(axios, 'post').mockImplementation(async () => {
+        return {};
+      });
+
+      const result = await service.sendEmail({
+        subject: 'Verify Your Email',
+        to: 'email',
+        template: EmailTemplate.VERIFY_EMAIL,
+        emailVars: [
+          { key: 'code', value: 'code' },
+          { key: 'userName', value: 'email' },
+        ],
+      });
+      const formSpy = jest.spyOn(FormData.prototype, 'append');
+      expect(formSpy).toHaveBeenCalled();
+      //expect(FormData.prototype.append).toHaveBeenCalledTimes(6);
+      //expect(result).toEqual(true);
+
+      expect(axios.post).toHaveBeenCalledTimes(1);
+      expect(axios.post).toHaveBeenCalledWith(
+        expect.any(String),
+        expect.any(Object),
+        expect.any(Object),
+      );
+
+      expect(result).toEqual(true);
+    });
+
+    it('[실패]', async () => {
+      jest.spyOn(axios, 'post').mockImplementation(async () => {
+        throw new Error();
+      });
+
+      const result = await service.sendEmail({
+        subject: 'Verify Your Email',
+        to: 'email',
+        template: EmailTemplate.VERIFY_EMAIL,
+        emailVars: [
+          { key: 'code', value: 'code' },
+          { key: 'userName', value: 'email' },
+        ],
+      });
+
+      expect(result).toEqual(false);
+    });
+  });
 });

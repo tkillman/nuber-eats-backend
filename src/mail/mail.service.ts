@@ -17,7 +17,7 @@ export class MailService {
     to: string;
     template: EmailTemplate;
     emailVars: { [key: string]: string }[];
-  }) {
+  }): Promise<boolean> {
     const form = new FormData();
     form.append('from', `Excited User <mailgun@${this.options.domain}>`);
     // form.append(
@@ -32,7 +32,6 @@ export class MailService {
       form.append(`v:${emailVar.key}`, emailVar.value);
     });
 
-    console.log(form);
     try {
       const response = await axios.post(
         `https://api.mailgun.net/v3/${this.options.domain}/messages`,
@@ -46,8 +45,10 @@ export class MailService {
         },
       );
       console.log('response', response.data);
+      return true;
     } catch (error) {
       //console.error(error?.message);
+      return false;
     }
   }
 
