@@ -59,22 +59,7 @@ export class UsersResolver {
   async userProfile(
     @Args() userProfileInput: UserProfileInput,
   ): Promise<UserProfileOutput> {
-    console.log('userProfileInput', userProfileInput);
-    try {
-      const user = await this.usersService.findById(userProfileInput.userId);
-      if (!user) {
-        throw Error();
-      }
-      return {
-        ok: true,
-        user,
-      };
-    } catch (error) {
-      return {
-        ok: false,
-        error: error,
-      };
-    }
+    return await this.usersService.findById(userProfileInput.userId);
   }
 
   @Mutation(() => EditProfileOutput)

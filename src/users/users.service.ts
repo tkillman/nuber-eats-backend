@@ -134,39 +134,52 @@ export class UsersService {
     if (editProfileInput.email) {
       user.email = editProfileInput.email;
       user.verified = false;
-      const verification = await this.verifications.save(
-        this.verifications.create({ user: user }),
-      );
 
-      this.mailService.sendVerificationEmail(user.email, verification.code);
+      const newVerification = this.verifications.create({
+        user: {
+          id: user.id,
+        },
+      });
+      console.log('newVerification', newVerification);
+      const verification = await this.verifications.save(newVerification);
+
+      await this.mailService.sendVerificationEmail(
+        user.email,
+        verification.code,
+      );
     }
 
     if (editProfileInput.password) {
       user.password = editProfileInput.password;
     }
 
-    return this.users.save(user);
+    return await this.users.save(user);
   }
 
   async verifyEmail(code: string): Promise<boolean> {
-    //typeorm에서 relations는 객체 전체를 가져옴
-    // loadRelationIds는 해당 객체의 id만 가져옴
-    const verification = await this.verifications.findOneOrFail({
-      where: { code },
-      relations: ['user'],
-    });
+    try {
+      //typeorm에서 relations는 객체 전체를 가져옴
+      // loadRelationIds는 해당 객체의 id만 가져옴
+      const verification = await this.verifications.findOneOrFail({
+        where: { code },
+        relations: ['user'],
+      });
 
-    if (verification) {
-      console.log('verification', verification.user);
-      verification.user.verified = true;
-      // 여기서 저장하다가 패스워드가 2번 해시화되는 오류 발생
-      // step1. @Column({ select: false })로 select 할 때 password를 제외
-      // step2. hashPassword 함수는 객체에 패스워드가 존재할때만
-      this.users.save(verification.user);
-      this.verifications.delete(verification.id);
-      return true;
+      if (verification) {
+        console.log('verification', verification.user);
+        verification.user.verified = true;
+        // 여기서 저장하다가 패스워드가 2번 해시화되는 오류 발생
+        // step1. @Column({ select: false })로 select 할 때 password를 제외
+        // step2. hashPassword 함수는 객체에 패스워드가 존재할때만
+        this.users.save(verification.user);
+        this.verifications.delete(verification.id);
+        return true;
+      }
+
+      return false;
+    } catch (error) {
+      console.error(error);
+      return false;
     }
-
-    return false;
   }
 }
