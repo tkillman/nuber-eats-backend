@@ -2,7 +2,9 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
 import * as request from 'supertest';
 import { AppModule } from './../src/app.module';
-import { DataSource, getConnection } from 'typeorm';
+import { DataSource, getConnection, Repository } from 'typeorm';
+import { User } from 'src/users/entites/user.entity';
+import { getRepositoryToken } from '@nestjs/typeorm';
 
 jest.mock('axios');
 
@@ -17,6 +19,7 @@ describe('AppController (e2e)', () => {
   let app: INestApplication;
   let dataSource: DataSource; /* 추가된 코드 */
   let jwtToken: string;
+  let userRepositry: Repository<User>;
 
   beforeAll(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -25,6 +28,7 @@ describe('AppController (e2e)', () => {
 
     app = module.createNestApplication();
     dataSource = module.get(DataSource); /* 추가된 코드 */
+    userRepositry = module.get(getRepositoryToken(User));
     await app.init();
   });
 
@@ -165,14 +169,21 @@ describe('AppController (e2e)', () => {
   });
 
   describe('userProfile', () => {
+    let users: User[] = [];
+
+    beforeAll(async () => {
+      // e2e 테스트시에 직접 디비 조회도 가능
+      users = await userRepositry.find();
+    });
+
     it('[성공] 유저 프로필 조회', () => {
       return request(app.getHttpServer())
         .post(GRAPHQL_ENDPOINT)
-        .set('Authorization', `Bearer ${jwtToken}`)
+        .set('X-JWT', `${jwtToken}`)
         .send({
           query: `
             query {
-              userProfile(userId : 1){
+              userProfile(userId : ${users[0].id}){
                 error
                 ok
                 user {
@@ -195,7 +206,7 @@ describe('AppController (e2e)', () => {
     it('[실패] 유저 프로필 조회', () => {
       return request(app.getHttpServer())
         .post(GRAPHQL_ENDPOINT)
-        .set('Authorization', `Bearer ${jwtToken}`)
+        .set('X-JWT', `${jwtToken}`)
         .send({
           query: `
             query {
