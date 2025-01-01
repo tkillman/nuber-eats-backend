@@ -21,10 +21,7 @@ export class UsersService {
     private readonly verifications: Repository<Verification>,
     private readonly jwtService: JwtService,
     private readonly mailService: MailService,
-  ) {
-    console.log('UsersService created');
-    this.jwtService.sayHello();
-  }
+  ) {}
 
   async createUser({
     email,
@@ -55,7 +52,7 @@ export class UsersService {
       return { ok: true };
     } catch (error) {
       // 에러 발생
-      console.error(error);
+      console.error(error?.message);
       return { ok: false, error: '계정을 생성할 수 없습니다.' };
     }
   }
@@ -96,7 +93,7 @@ export class UsersService {
         token: token,
       };
     } catch (error) {
-      console.error(error);
+      console.error(error?.message);
       return {
         ok: false,
         error: '로그인 할 수 없습니다.',
@@ -112,7 +109,7 @@ export class UsersService {
         user,
       };
     } catch (error) {
-      console.error(error);
+      console.error(error?.message);
       return {
         ok: false,
         error: '유저를 찾을 수 없습니다.',
@@ -178,7 +175,8 @@ export class UsersService {
 
       return false;
     } catch (error) {
-      console.error(error);
+      //console.error(error);
+      console.error('verifyEmail error', error?.message);
       return false;
     }
   }

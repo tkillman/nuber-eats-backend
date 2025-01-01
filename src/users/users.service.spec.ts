@@ -28,7 +28,6 @@ const mockRepository = () => ({
 });
 
 const mockJwtService = () => ({
-  sayHello: jest.fn(),
   sign: jest.fn(() => 'signed-token-baby'),
   verify: jest.fn(),
 });

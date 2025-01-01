@@ -11,9 +11,9 @@ export class JwtService {
     private readonly configService: ConfigService,
   ) {}
 
-  sayHello(): void {
-    console.log(`Hello from JWT service ${JSON.stringify(this.options)}`);
-  }
+  // sayHello(): void {
+  //   console.log(`Hello from JWT service ${JSON.stringify(this.options)}`);
+  // }
 
   sign(id: number): string {
     // configService를 사용해도 되는데 연습상 options를 주입해서 사용
