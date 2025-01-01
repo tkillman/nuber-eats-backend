@@ -4,19 +4,18 @@ import { CoreEntity } from 'src/common/entities/core.entity';
 import {
   Column,
   Entity,
-  ManyToMany,
-  ManyToOne,
+  OneToMany,
   PrimaryColumn,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-import { Category } from './category.entity';
+import { Restaurant } from './restaurants.entity';
 
 // ObjectType, Field 는 그래프큐엘용도
 // Entity, Column 은 TypeORM용도
 
 @ObjectType()
 @Entity()
-export class Restaurant extends CoreEntity {
+export class Category extends CoreEntity {
   @Field(() => String)
   @Column()
   @IsString()
@@ -35,18 +34,7 @@ export class Restaurant extends CoreEntity {
   @IsString()
   coverImage: string;
 
-  @Field(() => String)
-  @Column()
-  @IsString()
-  address: string;
-
-  @Field(() => String)
-  @Column()
-  @IsString()
-  @Length(5, 10)
-  ownerName: string;
-
-  @Field(() => Category)
-  @ManyToOne(() => Category, (category) => category.restaurants)
-  category: Category;
+  @Field(() => [Restaurant])
+  @OneToMany(() => Restaurant, (restaurant) => restaurant.category)
+  restaurants: Restaurant[];
 }
