@@ -61,10 +61,10 @@ export class ResutaurantsResolver {
     @Args('input') createRestaurantInput: CreateRestaurantInputType,
   ): Promise<CreateRestaurantOutput> {
     try {
-      await this.restaurantsService.createRestaurant(createRestaurantInput);
-      return {
-        ok: true,
-      };
+      return await this.restaurantsService.createRestaurant(
+        authUser,
+        createRestaurantInput,
+      );
     } catch (error) {
       return {
         ok: false,

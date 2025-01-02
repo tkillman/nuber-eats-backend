@@ -44,7 +44,10 @@ export class CreateRestaurantInputType extends OmitType(
   Restaurant,
   ['id', 'category', 'user', 'createdAt', 'updatedAt'],
   InputType,
-) {}
+) {
+  @Field(() => String)
+  categoryName: string;
+}
 
 @ObjectType()
 export class CreateRestaurantOutput extends MutationOutput {}

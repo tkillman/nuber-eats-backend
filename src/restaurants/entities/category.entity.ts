@@ -18,9 +18,14 @@ import { Restaurant } from './restaurants.entity';
 @Entity()
 export class Category extends CoreEntity {
   @Field(() => String)
-  @Column()
+  @Column({ unique: true })
   @IsString()
   name: string;
+
+  @Field(() => String)
+  @Column({ unique: true })
+  @IsString()
+  slug: string;
 
   // defaultValue를 사용하면 dto에 이미 세팅됨, resolver에서 console 찍으면 바로 세팅되어 있는거 확인 가능
   // Column에 default를 사용하면 dto에는 없어도 DB에 세팅됨
@@ -30,8 +35,8 @@ export class Category extends CoreEntity {
   // @IsOptional()
   // isVegan: boolean;
 
-  @Field(() => String)
-  @Column()
+  @Field(() => String, { nullable: true })
+  @Column({ nullable: true })
   @IsString()
   coverImage: string;
 
