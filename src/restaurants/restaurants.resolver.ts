@@ -13,6 +13,11 @@ import { UseGuards } from '@nestjs/common';
 import { Role } from 'src/auth/role.decorator';
 import { UserRole } from 'src/users/entites/user.entity';
 
+import {
+  EditRestaurantInput,
+  EditRestaurantOutput,
+} from './dtos/edit-restaurant.dto';
+
 @Resolver(() => Restaurant)
 export class ResutaurantsResolver {
   constructor(private readonly restaurantsService: RestaurantsService) {}
@@ -73,5 +78,16 @@ export class ResutaurantsResolver {
         error,
       };
     }
+  }
+
+  @Mutation(() => EditRestaurantOutput)
+  async editRestaurant(
+    @AuthUser() authUser,
+    @Args('input') editRestaurantInput: EditRestaurantInput,
+  ): Promise<EditRestaurantOutput> {
+    await this.restaurantsService.editRestaurant(authUser, editRestaurantInput);
+    return {
+      ok: true,
+    };
   }
 }

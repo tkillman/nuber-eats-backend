@@ -9,6 +9,10 @@ import {
 } from './dtos/create-restaurant.dto';
 import { User } from 'src/users/entites/user.entity';
 import { Category } from './entities/category.entity';
+import {
+  EditRestaurantInput,
+  EditRestaurantOutput,
+} from './dtos/edit-restaurant.dto';
 // import { UpdateRestaurantDto } from './dtos/update-restaurant.dto';
 
 @Injectable()
@@ -71,5 +75,14 @@ export class RestaurantsService {
         error: error,
       };
     }
+  }
+
+  async editRestaurant(
+    user: User,
+    editRestaurantInput: EditRestaurantInput,
+  ): Promise<EditRestaurantOutput> {
+    return {
+      ok: true,
+    };
   }
 }
