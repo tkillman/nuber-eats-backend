@@ -85,7 +85,10 @@ export class ResutaurantsResolver {
     @AuthUser() authUser,
     @Args('input') editRestaurantInput: EditRestaurantInput,
   ): Promise<EditRestaurantOutput> {
-    await this.restaurantsService.editRestaurant(authUser, editRestaurantInput);
+    return await this.restaurantsService.editRestaurant(
+      authUser,
+      editRestaurantInput,
+    );
     return {
       ok: true,
     };

@@ -8,6 +8,7 @@ import {
   ManyToOne,
   PrimaryColumn,
   PrimaryGeneratedColumn,
+  RelationId,
 } from 'typeorm';
 import { Category } from './category.entity';
 import { User } from 'src/users/entites/user.entity';
@@ -52,4 +53,7 @@ export class Restaurant extends CoreEntity {
   @Field(() => User)
   @ManyToOne(() => User, (user) => user.restaurants)
   user: User;
+
+  @RelationId((restaurant: Restaurant) => restaurant.user)
+  userId: number;
 }

@@ -39,28 +39,35 @@ export class RestaurantsService {
   //   return this.restaurants.update(id, { ...data });
   // }
 
+  async getOrCreateCategory(categoryName: string): Promise<Category> {
+    let category: Category;
+
+    const slug = categoryName.toLocaleLowerCase().replace(/ /g, '-');
+    category = await this.categories.findOne({ where: { slug: slug } });
+
+    if (!category) {
+      category = await this.categories.save(
+        this.categories.create({
+          slug,
+          name: categoryName,
+        }),
+      );
+    }
+
+    return category;
+  }
+
   async createRestaurant(
     authUser: User,
     createRestaurantInput: CreateRestaurantInputType,
   ): Promise<CreateRestaurantOutput> {
-    let category: Category;
     try {
       const newRestaurant = this.restaurants.create(createRestaurantInput);
       newRestaurant.user = authUser;
 
-      const slug = createRestaurantInput.categoryName
-        .toLocaleLowerCase()
-        .replace(/ /g, '-');
-      category = await this.categories.findOne({ where: { slug: slug } });
-
-      if (!category) {
-        category = await this.categories.save(
-          this.categories.create({
-            slug,
-            name: createRestaurantInput.categoryName,
-          }),
-        );
-      }
+      const category = await this.getOrCreateCategory(
+        createRestaurantInput.categoryName,
+      );
 
       newRestaurant.category = category;
 
@@ -81,8 +88,26 @@ export class RestaurantsService {
     user: User,
     editRestaurantInput: EditRestaurantInput,
   ): Promise<EditRestaurantOutput> {
-    return {
-      ok: true,
-    };
+    try {
+      const restaurant = await this.restaurants.findOne({
+        where: { id: editRestaurantInput.restaurantId },
+      });
+
+      console.log('restaurant', restaurant);
+      if (user.id !== restaurant.userId) {
+        return {
+          ok: false,
+          error: '당신의 레스토랑이 아닙니다.',
+        };
+      }
+      return {
+        ok: true,
+      };
+    } catch (error) {
+      return {
+        ok: false,
+        error,
+      };
+    }
   }
 }
