@@ -1,9 +1,13 @@
-import { Repository } from 'typeorm';
+import { DataSource, EntityRepository, Repository } from 'typeorm';
 import { Category } from '../entities/category.entity';
 import { Injectable } from '@nestjs/common';
 
 @Injectable()
 export class CategoryRepository extends Repository<Category> {
+  constructor(dataSource: DataSource) {
+    super(Category, dataSource.createEntityManager());
+  }
+
   async getOrCreateCategory(categoryName: string): Promise<Category> {
     let category: Category;
 

@@ -21,6 +21,7 @@ export class RestaurantsService {
   constructor(
     @InjectRepository(Restaurant)
     private readonly restaurants: Repository<Restaurant>,
+    @InjectRepository(CategoryRepository)
     private readonly categories: CategoryRepository,
   ) {}
 
@@ -85,6 +86,7 @@ export class RestaurantsService {
       let category: Category = null;
 
       if (editRestaurantInput.categoryName) {
+        console.log('this.categories');
         category = await this.categories.getOrCreateCategory(
           editRestaurantInput.categoryName,
         );
