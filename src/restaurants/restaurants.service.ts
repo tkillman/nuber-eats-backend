@@ -13,6 +13,7 @@ import {
   EditRestaurantInput,
   EditRestaurantOutput,
 } from './dtos/edit-restaurant.dto';
+import { CategoryRepository } from './repositories/category.repository';
 // import { UpdateRestaurantDto } from './dtos/update-restaurant.dto';
 
 @Injectable()
@@ -20,8 +21,7 @@ export class RestaurantsService {
   constructor(
     @InjectRepository(Restaurant)
     private readonly restaurants: Repository<Restaurant>,
-    @InjectRepository(Category)
-    private readonly categories: Repository<Category>,
+    private readonly categories: CategoryRepository,
   ) {}
 
   // getAll(): Promise<Restaurant[]> {
@@ -39,24 +39,6 @@ export class RestaurantsService {
   //   return this.restaurants.update(id, { ...data });
   // }
 
-  async getOrCreateCategory(categoryName: string): Promise<Category> {
-    let category: Category;
-
-    const slug = categoryName.toLocaleLowerCase().replace(/ /g, '-');
-    category = await this.categories.findOne({ where: { slug: slug } });
-
-    if (!category) {
-      category = await this.categories.save(
-        this.categories.create({
-          slug,
-          name: categoryName,
-        }),
-      );
-    }
-
-    return category;
-  }
-
   async createRestaurant(
     authUser: User,
     createRestaurantInput: CreateRestaurantInputType,
@@ -65,7 +47,7 @@ export class RestaurantsService {
       const newRestaurant = this.restaurants.create(createRestaurantInput);
       newRestaurant.user = authUser;
 
-      const category = await this.getOrCreateCategory(
+      const category = await this.categories.getOrCreateCategory(
         createRestaurantInput.categoryName,
       );
 
@@ -93,17 +75,34 @@ export class RestaurantsService {
         where: { id: editRestaurantInput.restaurantId },
       });
 
-      console.log('restaurant', restaurant);
       if (user.id !== restaurant.userId) {
         return {
           ok: false,
           error: '당신의 레스토랑이 아닙니다.',
         };
       }
+
+      let category: Category = null;
+
+      if (editRestaurantInput.categoryName) {
+        category = await this.categories.getOrCreateCategory(
+          editRestaurantInput.categoryName,
+        );
+      }
+
+      await this.restaurants.save([
+        {
+          id: editRestaurantInput.restaurantId,
+          ...editRestaurantInput,
+          ...(category && { category }),
+        },
+      ]);
+
       return {
         ok: true,
       };
     } catch (error) {
+      console.log(error);
       return {
         ok: false,
         error,
