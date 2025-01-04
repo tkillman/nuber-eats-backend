@@ -16,6 +16,10 @@ import {
 import { CategoryRepository } from './repositories/category.repository';
 import { DeleteRestaurantOutput } from './dtos/delete-restaurant.dto';
 import { AllCategoriesOutput } from './dtos/all-category.dto';
+import {
+  FindCategoryInput,
+  FindCategoryOutput,
+} from './dtos/find-category.dto';
 // import { UpdateRestaurantDto } from './dtos/update-restaurant.dto';
 
 @Injectable()
@@ -145,5 +149,25 @@ export class RestaurantsService {
         },
       },
     });
+  }
+
+  async findCategoryBySlug({
+    slug,
+  }: FindCategoryInput): Promise<FindCategoryOutput> {
+    try {
+      const category = await this.categories.findOneOrFail({
+        where: { slug },
+        relations: ['restaurants'],
+      });
+      return {
+        ok: true,
+        category,
+      };
+    } catch (error) {
+      return {
+        ok: false,
+        error: '카테고리를 찾을 수 없습니다.',
+      };
+    }
   }
 }
