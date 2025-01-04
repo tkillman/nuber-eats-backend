@@ -2,6 +2,7 @@ import {
   Args,
   Int,
   Mutation,
+  Parent,
   Query,
   ResolveField,
   Resolver,
@@ -121,9 +122,9 @@ export class CategoryResolver {
   constructor(private readonly restaurantsService: RestaurantsService) {}
 
   @ResolveField(() => Int)
-  restaurantCount(): number {
+  async restaurantCount(@Parent() parent: Category): Promise<number> {
     // ResolveField는 모든 응답에 computed field를 추가할 수 있음
-    return 80;
+    return this.restaurantsService.countRestaurants(parent);
   }
 
   @Query(() => AllCategoriesOutput)
