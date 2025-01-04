@@ -138,6 +138,12 @@ export class RestaurantsService {
   }
 
   async countRestaurants(category: Category) {
-    return this.restaurants.count({ where: { category } });
+    return this.restaurants.count({
+      where: {
+        category: {
+          id: category.id,
+        },
+      },
+    });
   }
 }
