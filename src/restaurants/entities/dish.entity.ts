@@ -22,7 +22,7 @@ export class DishOption {
 @Entity()
 export class Dish extends CoreEntity {
   @Field(() => String)
-  @Column({ unique: true })
+  @Column()
   @IsString()
   @Length(5)
   name: string;
