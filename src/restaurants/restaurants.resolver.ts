@@ -36,6 +36,11 @@ import {
   AllRestaurantInput,
   AllRestaurantOutput,
 } from './dtos/all-restaurant.dto';
+import { RestaurantInput, RestaurantOutput } from './dtos/restaurant.dto';
+import {
+  SearchRestaurantInput,
+  SearchRestaurantOutput,
+} from './dtos/search-restaurant.dto';
 
 @Resolver(() => Restaurant)
 export class ResutaurantsResolver {
@@ -129,6 +134,20 @@ export class ResutaurantsResolver {
     @Args('input') allRestaurantInput: AllRestaurantInput,
   ): Promise<AllRestaurantOutput> {
     return this.restaurantsService.allRestaurants(allRestaurantInput);
+  }
+
+  @Query(() => RestaurantOutput)
+  async Restaurant(
+    @Args('input') RestaurantInput: RestaurantInput,
+  ): Promise<RestaurantOutput> {
+    return this.restaurantsService.restaurantById(RestaurantInput);
+  }
+
+  @Query(() => SearchRestaurantOutput)
+  async searchRestaurants(
+    @Args('input') searchRestaurantInput: SearchRestaurantInput,
+  ) {
+    return this.restaurantsService.searchRestaurants(searchRestaurantInput);
   }
 }
 
