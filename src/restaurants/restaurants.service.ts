@@ -14,6 +14,7 @@ import {
   EditRestaurantOutput,
 } from './dtos/edit-restaurant.dto';
 import { CategoryRepository } from './repositories/category.repository';
+import { DeleteRestaurantOutput } from './dtos/delete-restaurant.dto';
 // import { UpdateRestaurantDto } from './dtos/update-restaurant.dto';
 
 @Injectable()
@@ -110,5 +111,13 @@ export class RestaurantsService {
         error,
       };
     }
+  }
+
+  async deleteRestaurant(
+    user: User,
+    restaurantId: number,
+  ): Promise<DeleteRestaurantOutput> {
+    await this.restaurants.delete({ id: restaurantId, userId: user.id });
+    return { ok: true };
   }
 }
