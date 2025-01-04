@@ -14,4 +14,7 @@ export class PaginationInput {
 export class PaginationOutput extends MutationOutput {
   @Field(() => Number, { nullable: true })
   totalPages?: number;
+
+  @Field(() => Number, { nullable: true })
+  totalResults?: number;
 }

@@ -20,6 +20,10 @@ import {
   FindCategoryInput,
   FindCategoryOutput,
 } from './dtos/find-category.dto';
+import {
+  AllRestaurantInput,
+  AllRestaurantOutput,
+} from './dtos/all-restaurant.dto';
 // import { UpdateRestaurantDto } from './dtos/update-restaurant.dto';
 
 @Injectable()
@@ -185,6 +189,29 @@ export class RestaurantsService {
       return {
         ok: false,
         error: '카테고리를 찾을 수 없습니다.',
+      };
+    }
+  }
+
+  async allRestaurants(
+    input: AllRestaurantInput,
+  ): Promise<AllRestaurantOutput> {
+    try {
+      const [restaurants, totalResults] = await this.restaurants.findAndCount({
+        take: input.pageSize,
+        skip: (input.page - 1) * input.pageSize,
+      });
+
+      return {
+        ok: true,
+        results: restaurants,
+        totalPages: Math.ceil(totalResults / input.pageSize),
+        totalResults: totalResults,
+      };
+    } catch (error) {
+      return {
+        ok: false,
+        error: '레스토랑을 불러오는데 실패했습니다.',
       };
     }
   }

@@ -32,6 +32,10 @@ import {
   FindCategoryInput,
   FindCategoryOutput,
 } from './dtos/find-category.dto';
+import {
+  AllRestaurantInput,
+  AllRestaurantOutput,
+} from './dtos/all-restaurant.dto';
 
 @Resolver(() => Restaurant)
 export class ResutaurantsResolver {
@@ -118,6 +122,13 @@ export class ResutaurantsResolver {
       authUser,
       restaurantId,
     );
+  }
+
+  @Query(() => AllRestaurantOutput)
+  async allRestaurants(
+    @Args('input') allRestaurantInput: AllRestaurantInput,
+  ): Promise<AllRestaurantOutput> {
+    return this.restaurantsService.allRestaurants(allRestaurantInput);
   }
 }
 
