@@ -6,12 +6,14 @@ import {
   Entity,
   ManyToMany,
   ManyToOne,
+  OneToMany,
   PrimaryColumn,
   PrimaryGeneratedColumn,
   RelationId,
 } from 'typeorm';
 import { Category } from './category.entity';
 import { User } from 'src/users/entites/user.entity';
+import { Dish } from './dish.entity';
 
 // ObjectType, Field 는 그래프큐엘용도
 // Entity, Column 은 TypeORM용도
@@ -56,4 +58,8 @@ export class Restaurant extends CoreEntity {
 
   @RelationId((restaurant: Restaurant) => restaurant.user)
   userId: number;
+
+  @Field(() => [Dish])
+  @OneToMany(() => Dish, (dish) => dish.restaurant)
+  menu: Dish[];
 }
