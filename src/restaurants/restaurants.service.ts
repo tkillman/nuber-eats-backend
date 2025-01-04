@@ -29,6 +29,8 @@ import {
   SearchRestaurantInput,
   SearchRestaurantOutput,
 } from './dtos/search-restaurant.dto';
+import { CreateDishInput, CreateDishOutput } from './dtos/create-dish.dto';
+import { Dish } from './entities/dish.entity';
 
 // import { UpdateRestaurantDto } from './dtos/update-restaurant.dto';
 
@@ -39,6 +41,8 @@ export class RestaurantsService {
     private readonly restaurants: Repository<Restaurant>,
     @InjectRepository(CategoryRepository)
     private readonly categories: CategoryRepository,
+    @InjectRepository(Dish)
+    private readonly dishes: Repository<Dish>,
   ) {}
 
   // getAll(): Promise<Restaurant[]> {
@@ -262,6 +266,42 @@ export class RestaurantsService {
       return {
         ok: false,
         error: `레스토랑을 찾을 수 없습니다. ${error}`,
+      };
+    }
+  }
+
+  async createDish(
+    user: User,
+    input: CreateDishInput,
+  ): Promise<CreateDishOutput> {
+    try {
+      const restaurant = await this.restaurants.findOne({
+        where: { id: input.restaurantId },
+      });
+
+      if (!restaurant) {
+        return {
+          ok: false,
+          error: '레스토랑을 찾을 수 없습니다.',
+        };
+      }
+
+      if (user.id !== restaurant.userId) {
+        return {
+          ok: false,
+          error: '당신의 레스토랑이 아닙니다.',
+        };
+      }
+
+      await this.dishes.save(this.dishes.create({ ...input, restaurant }));
+
+      return {
+        ok: true,
+      };
+    } catch (error) {
+      return {
+        ok: false,
+        error,
       };
     }
   }
