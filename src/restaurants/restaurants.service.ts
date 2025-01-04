@@ -153,17 +153,35 @@ export class RestaurantsService {
 
   async findCategoryBySlug({
     slug,
+    page,
+    pageSize,
   }: FindCategoryInput): Promise<FindCategoryOutput> {
+    console.log('slug', slug, 'page', page, 'pageSize', pageSize);
     try {
       const category = await this.categories.findOneOrFail({
         where: { slug },
-        relations: ['restaurants'],
       });
+
+      const restaurants = await this.restaurants.find({
+        where: {
+          category: {
+            id: category.id,
+          },
+        },
+        take: pageSize,
+        skip: (page - 1) * pageSize,
+      });
+
+      category.restaurants = restaurants;
+      const totalResults = await this.countRestaurants(category);
+
       return {
         ok: true,
         category,
+        totalPages: Math.ceil(totalResults / pageSize),
       };
     } catch (error) {
+      console.error(error);
       return {
         ok: false,
         error: '카테고리를 찾을 수 없습니다.',
