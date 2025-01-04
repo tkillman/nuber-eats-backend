@@ -15,6 +15,7 @@ import {
 } from './dtos/edit-restaurant.dto';
 import { CategoryRepository } from './repositories/category.repository';
 import { DeleteRestaurantOutput } from './dtos/delete-restaurant.dto';
+import { AllCategoriesOutput } from './dtos/all-category.dto';
 // import { UpdateRestaurantDto } from './dtos/update-restaurant.dto';
 
 @Injectable()
@@ -119,5 +120,20 @@ export class RestaurantsService {
   ): Promise<DeleteRestaurantOutput> {
     await this.restaurants.delete({ id: restaurantId, userId: user.id });
     return { ok: true };
+  }
+
+  async allCategories(): Promise<AllCategoriesOutput> {
+    try {
+      const categories = await this.categories.find();
+      return {
+        ok: true,
+        categories,
+      };
+    } catch (error) {
+      return {
+        ok: false,
+        error: `카테고리를 불러오는데 실패했습니다. ${error}`,
+      };
+    }
   }
 }
