@@ -31,6 +31,8 @@ import {
 } from './dtos/search-restaurant.dto';
 import { CreateDishInput, CreateDishOutput } from './dtos/create-dish.dto';
 import { Dish } from './entities/dish.entity';
+import { EditDishInput, EditDishOutput } from './dtos/edit-dish.dto';
+import { DeleteDishInput } from './dtos/delete-dish.dto';
 
 // import { UpdateRestaurantDto } from './dtos/update-restaurant.dto';
 
@@ -294,6 +296,82 @@ export class RestaurantsService {
       }
 
       await this.dishes.save(this.dishes.create({ ...input, restaurant }));
+
+      return {
+        ok: true,
+      };
+    } catch (error) {
+      return {
+        ok: false,
+        error,
+      };
+    }
+  }
+
+  async editDish(
+    user: User,
+    editDishInput: EditDishInput,
+  ): Promise<EditDishOutput> {
+    try {
+      const dish = await this.dishes.findOne({
+        where: { id: editDishInput.dishId },
+        relations: ['restaurant'],
+      });
+
+      if (!dish) {
+        return {
+          ok: false,
+          error: '음식을 찾을 수 없습니다.',
+        };
+      }
+
+      if (user.id !== dish.restaurant.userId) {
+        return {
+          ok: false,
+          error: '당신의 음식이 아닙니다.',
+        };
+      }
+
+      await this.dishes.save([
+        {
+          id: editDishInput.dishId,
+          ...editDishInput,
+        },
+      ]);
+
+      return {
+        ok: true,
+      };
+    } catch (error) {
+      return {
+        ok: false,
+        error,
+      };
+    }
+  }
+
+  async deleteDish(user: User, deleteDishInput: DeleteDishInput) {
+    try {
+      const dish = await this.dishes.findOne({
+        where: { id: deleteDishInput.dishId },
+        relations: ['restaurant'],
+      });
+
+      if (!dish) {
+        return {
+          ok: false,
+          error: '음식을 찾을 수 없습니다.',
+        };
+      }
+
+      if (user.id !== dish.restaurant.userId) {
+        return {
+          ok: false,
+          error: '당신의 음식이 아닙니다.',
+        };
+      }
+
+      await this.dishes.delete(deleteDishInput.dishId);
 
       return {
         ok: true,
