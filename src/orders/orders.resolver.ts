@@ -3,10 +3,11 @@ import { Order } from './entities/order.entity';
 import { OrdersService } from './orders.service';
 import { AuthUser } from 'src/auth/auth-user.decorator';
 import { Role } from 'src/auth/role.decorator';
-import { User } from 'src/users/entites/user.entity';
+import { User, UserRole } from 'src/users/entites/user.entity';
 import { CreateOrderInput, CreateOrderOutput } from './dtos/create-order.dto';
 
 import { FindOrderInput, FindOrderOutput } from './dtos/order.dto';
+import { EditOrderInput, EditOrderOutput } from './dtos/edit-order.dto';
 
 @Resolver(() => Order)
 export class OrdersResolver {
@@ -28,5 +29,14 @@ export class OrdersResolver {
     @Args('input') findOrderInput: FindOrderInput,
   ): Promise<FindOrderOutput> {
     return this.ordersService.getOrders(user, findOrderInput);
+  }
+
+  @Mutation(() => EditOrderOutput)
+  @Role(['Any'])
+  async editOrder(
+    @AuthUser() authUser,
+    @Args('input') editOrderInput: EditOrderInput,
+  ): Promise<EditOrderOutput> {
+    return this.ordersService.editOrder(authUser, editOrderInput);
   }
 }

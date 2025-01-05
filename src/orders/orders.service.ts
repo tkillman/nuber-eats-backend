@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Order } from './entities/order.entity';
+import { Order, OrderStatus } from './entities/order.entity';
 import { Repository } from 'typeorm';
 import { User, UserRole } from 'src/users/entites/user.entity';
 import { CreateOrderInput, CreateOrderOutput } from './dtos/create-order.dto';
@@ -9,6 +9,7 @@ import { OrderItem } from './entities/order-item.entity';
 import { Dish } from 'src/restaurants/entities/dish.entity';
 import { FindOrderInput, FindOrderOutput } from './dtos/order.dto';
 import { GetOrderInput, GetOrderOutput } from './dtos/get-order.dto';
+import { EditOrderInput, EditOrderOutput } from './dtos/edit-order.dto';
 
 @Injectable()
 export class OrdersService {
@@ -191,6 +192,69 @@ export class OrdersService {
       return {
         ok: false,
         error: '주문을 찾을 수 없습니다.',
+      };
+    }
+  }
+
+  async editOrder(
+    user: User,
+    editOrderInput: EditOrderInput,
+  ): Promise<EditOrderOutput> {
+    try {
+      const order = await this.orders.findOne({
+        where: { id: editOrderInput.id },
+      });
+      if (!order) {
+        return {
+          ok: false,
+          error: '주문을 찾을 수 없습니다.',
+        };
+      }
+
+      if (!this.canSeeOrder(user, order)) {
+        return {
+          ok: false,
+          error: '주문을 볼 수 없습니다.',
+        };
+      }
+
+      let canEdit = false;
+
+      if (user.role === UserRole.Owner) {
+        if (
+          order.status === OrderStatus.Cooking ||
+          order.status === OrderStatus.Cooked
+        ) {
+          canEdit = true;
+        }
+      }
+
+      if (user.role === UserRole.Delivery) {
+        if (
+          order.status === OrderStatus.PickUp ||
+          order.status === OrderStatus.Delivered
+        ) {
+          canEdit = true;
+        }
+      }
+
+      if (!canEdit) {
+        return {
+          ok: false,
+          error: '주문을 수정할 수 있는 상태가 아닙니다.',
+        };
+      }
+
+      await this.orders.save([
+        {
+          id: editOrderInput.id,
+          status: editOrderInput.status,
+        },
+      ]);
+    } catch (error) {
+      return {
+        ok: false,
+        error: '주문을 수정할 수 없습니다.',
       };
     }
   }
