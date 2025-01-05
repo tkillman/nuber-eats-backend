@@ -10,12 +10,12 @@ import { CreateOrderInput, CreateOrderOutput } from './dtos/create-order.dto';
 export class OrdersResolver {
   constructor(private readonly ordersService: OrdersService) {}
 
-  @Mutation(() => Boolean)
+  @Mutation(() => CreateOrderOutput)
   @Role(['Client'])
   async createOrder(
     @AuthUser() client: User,
     @Args('input') createOrderInput: CreateOrderInput,
-  ): Promise<CreateOrderOutput> {
+  ) {
     return this.ordersService.createOrder(client, createOrderInput);
   }
 }
