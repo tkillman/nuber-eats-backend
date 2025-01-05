@@ -35,7 +35,7 @@ export class OrdersService {
         };
       }
 
-      createOrderInput.items.forEach(async (item) => {
+      for (const item of createOrderInput.items) {
         const dish = await this.dishes.findOne({ where: { id: item.dishId } });
 
         if (!dish) {
@@ -45,10 +45,29 @@ export class OrdersService {
           };
         }
 
-        await this.orderItems.save(
-          this.orderItems.create({ dish, options: item.options }),
-        );
-      });
+        for (const itemOption of item.options) {
+          const dishOption = dish.options.find(
+            (option) => option.name === itemOption.name,
+          );
+          if (dishOption) {
+            if (dishOption) {
+              const dishChoice = dishOption.choices.find(
+                (choice) => choice.name === itemOption.choice,
+              );
+              if (dishChoice) {
+                if (dishChoice.extra) {
+                  // dishChoice.extra
+                  console.log('dishChoice', dishChoice);
+                }
+              }
+            }
+          }
+        }
+
+        // await this.orderItems.save(
+        //   this.orderItems.create({ dish, options: item.options }),
+        // );
+      }
 
       // await this.orders.save(
       //   this.orders.create({
