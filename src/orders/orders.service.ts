@@ -8,6 +8,7 @@ import { Restaurant } from 'src/restaurants/entities/restaurants.entity';
 import { OrderItem } from './entities/order-item.entity';
 import { Dish } from 'src/restaurants/entities/dish.entity';
 import { FindOrderInput, FindOrderOutput } from './dtos/order.dto';
+import { GetOrderInput, GetOrderOutput } from './dtos/get-order.dto';
 
 @Injectable()
 export class OrdersService {
@@ -129,10 +130,62 @@ export class OrdersService {
           relations: ['orders'],
         });
         orders = restaurants.map((restaurant) => restaurant.orders).flat(1);
+        if (findOrderInput.status) {
+          orders = orders.filter(
+            (order) => order.status === findOrderInput.status,
+          );
+        }
       }
       return {
         ok: true,
         orders,
+      };
+    } catch (error) {
+      return {
+        ok: false,
+        error: '주문을 찾을 수 없습니다.',
+      };
+    }
+  }
+
+  private canSeeOrder(user: User, order: Order): boolean {
+    let canSee = true;
+    if (user.role === UserRole.Client && order.customerId !== user.id) {
+      canSee = false;
+    }
+    if (user.role === UserRole.Delivery && order.driverId !== user.id) {
+      canSee = false;
+    }
+    if (user.role === UserRole.Owner && order.restaurant.userId !== user.id) {
+      canSee = false;
+    }
+    return canSee;
+  }
+
+  async getOrder(
+    user: User,
+    getOrderInput: GetOrderInput,
+  ): Promise<GetOrderOutput> {
+    try {
+      const order = await this.orders.findOne({
+        where: { id: getOrderInput.orderId },
+        relations: ['restaurant'],
+      });
+      if (!order) {
+        return {
+          ok: false,
+          error: '주문을 찾을 수 없습니다.',
+        };
+      }
+      if (!this.canSeeOrder(user, order)) {
+        return {
+          ok: false,
+          error: '주문을 볼 수 없습니다.',
+        };
+      }
+      return {
+        ok: true,
+        order,
       };
     } catch (error) {
       return {

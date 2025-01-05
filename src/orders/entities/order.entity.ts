@@ -17,6 +17,7 @@ import {
   ManyToMany,
   ManyToOne,
   OneToMany,
+  RelationId,
 } from 'typeorm';
 import { OrderItem } from './order-item.entity';
 
@@ -40,12 +41,18 @@ export class Order extends CoreEntity {
   })
   customer?: User;
 
+  @RelationId((order: Order) => order.customer)
+  customerId: number;
+
   @Field(() => User, { nullable: true })
   @ManyToOne(() => User, (user) => user.rides, {
     nullable: true,
     onDelete: 'SET NULL',
   })
   driver?: User;
+
+  @RelationId((order: Order) => order.driver)
+  driverId: number;
 
   @Field(() => Restaurant, { nullable: true })
   @ManyToOne(() => Restaurant, (restaurant) => restaurant.orders, {
