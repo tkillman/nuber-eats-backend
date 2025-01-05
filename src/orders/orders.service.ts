@@ -2,11 +2,12 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Order } from './entities/order.entity';
 import { Repository } from 'typeorm';
-import { User } from 'src/users/entites/user.entity';
+import { User, UserRole } from 'src/users/entites/user.entity';
 import { CreateOrderInput, CreateOrderOutput } from './dtos/create-order.dto';
 import { Restaurant } from 'src/restaurants/entities/restaurants.entity';
 import { OrderItem } from './entities/order-item.entity';
 import { Dish } from 'src/restaurants/entities/dish.entity';
+import { FindOrderInput, FindOrderOutput } from './dtos/order.dto';
 
 @Injectable()
 export class OrdersService {
@@ -96,6 +97,47 @@ export class OrdersService {
       return {
         ok: false,
         error: `주문을 생성할 수 없습니다. ${error}`,
+      };
+    }
+  }
+
+  async getOrders(
+    user: User,
+    findOrderInput: FindOrderInput,
+  ): Promise<FindOrderOutput> {
+    let orders: Order[];
+    try {
+      if (user.role === UserRole.Client) {
+        orders = await this.orders.find({
+          where: {
+            customer: user,
+            ...findOrderInput,
+          },
+        });
+      } else if (user.role === UserRole.Delivery) {
+        orders = await this.orders.find({
+          where: {
+            driver: user,
+            ...findOrderInput,
+          },
+        });
+      } else if (user.role === UserRole.Owner) {
+        const restaurants = await this.restaurants.find({
+          where: {
+            user: user,
+          },
+          relations: ['orders'],
+        });
+        orders = restaurants.map((restaurant) => restaurant.orders).flat(1);
+      }
+      return {
+        ok: true,
+        orders,
+      };
+    } catch (error) {
+      return {
+        ok: false,
+        error: '주문을 찾을 수 없습니다.',
       };
     }
   }
