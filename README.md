@@ -7,6 +7,7 @@
 # 모듈 생성
 
 - nest g mo users
+- nest g mo orders
 
 # CreateDateColumn, UpdateDateColumn 두 개는 스페셜 컬럼
 

@@ -14,6 +14,7 @@ import {
 import { Category } from './category.entity';
 import { User } from 'src/users/entites/user.entity';
 import { Dish } from './dish.entity';
+import { Order } from 'src/orders/entities/order.entity';
 
 // ObjectType, Field 는 그래프큐엘용도
 // Entity, Column 은 TypeORM용도
@@ -62,4 +63,10 @@ export class Restaurant extends CoreEntity {
   @Field(() => [Dish])
   @OneToMany(() => Dish, (dish) => dish.restaurant)
   menu: Dish[];
+
+  @Field(() => [Order], { nullable: true })
+  @OneToMany(() => Order, (order) => order.restaurant, {
+    nullable: true,
+  })
+  orders?: Order[];
 }
