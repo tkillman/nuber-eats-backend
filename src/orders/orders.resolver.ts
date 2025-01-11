@@ -62,7 +62,7 @@ export class OrdersResolver {
         payload,
         context,
       );
-      return true;
+      return payload.pendingOrders.ownerId === context.user.id;
     },
     resolve: (payload) => {
       console.log('🚀 ~ OrdersResolver ~ @Subscription ~ payload:', payload);
