@@ -22,11 +22,11 @@ import {
 import { OrderItem } from './order-item.entity';
 
 export enum OrderStatus {
-  Pending = 'Pending',
-  Cooking = 'Cooking',
-  Cooked = 'Cooked',
-  PickUp = 'PickUp',
-  Delivered = 'Delivered',
+  Pending = 'Pending', // 주문접수
+  Cooking = 'Cooking', // 조리중
+  Cooked = 'Cooked', // 조리완료
+  PickUp = 'PickUp', // 픽업
+  Delivered = 'Delivered', // 배달완료
 }
 
 registerEnumType(OrderStatus, { name: 'OrderStatus' });

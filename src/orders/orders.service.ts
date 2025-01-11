@@ -157,7 +157,8 @@ export class OrdersService {
     if (user.role === UserRole.Delivery && order.driverId !== user.id) {
       canSee = false;
     }
-    if (user.role === UserRole.Owner && order.restaurant.userId !== user.id) {
+
+    if (user.role === UserRole.Owner && order.restaurant?.userId !== user.id) {
       canSee = false;
     }
     return canSee;
@@ -172,6 +173,7 @@ export class OrdersService {
         where: { id: getOrderInput.orderId },
         relations: ['restaurant'],
       });
+      console.log('🚀 ~ OrdersService ~ order:', order);
       if (!order) {
         return {
           ok: false,
@@ -203,14 +205,16 @@ export class OrdersService {
     try {
       const order = await this.orders.findOne({
         where: { id: editOrderInput.id },
+        relations: ['restaurant'],
       });
+      console.log('🚀 ~ OrdersService ~ order:', order);
       if (!order) {
         return {
           ok: false,
           error: '주문을 찾을 수 없습니다.',
         };
       }
-
+      console.log('user', user.role, 'order', order.status);
       if (!this.canSeeOrder(user, order)) {
         return {
           ok: false,
@@ -222,6 +226,7 @@ export class OrdersService {
 
       if (user.role === UserRole.Owner) {
         if (
+          order.status === OrderStatus.Pending ||
           order.status === OrderStatus.Cooking ||
           order.status === OrderStatus.Cooked
         ) {
@@ -251,7 +256,10 @@ export class OrdersService {
           status: editOrderInput.status,
         },
       ]);
+
+      return { ok: true };
     } catch (error) {
+      console.error(error);
       return {
         ok: false,
         error: '주문을 수정할 수 없습니다.',
