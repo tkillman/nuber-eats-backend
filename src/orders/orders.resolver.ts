@@ -10,7 +10,7 @@ import { FindOrderInput, FindOrderOutput } from './dtos/order.dto';
 import { EditOrderInput, EditOrderOutput } from './dtos/edit-order.dto';
 import { PubSub } from 'graphql-subscriptions';
 import { Inject } from '@nestjs/common';
-import { PUB_SUB } from 'src/common/common.constant';
+import { NEW_PENDING_ORDER, PUB_SUB } from 'src/common/common.constant';
 
 @Resolver(() => Order)
 export class OrdersResolver {
@@ -55,18 +55,22 @@ export class OrdersResolver {
     return true;
   }
 
-  @Subscription(() => String, {
-    filter: (payload, variables, context) => {
-      console.log('🚀 ~ OrdersResolver ~ filter ~ payload', payload);
-      console.log('🚀 ~ OrdersResolver ~ filter ~ variables', variables);
-      console.log('🚀 ~ OrdersResolver ~ filter ~ context', context);
-      return variables.potatoId === payload.readyPotatos;
+  @Subscription(() => Order, {
+    filter: (payload, _, context) => {
+      console.log(
+        '🚀 ~ OrdersResolver ~ @Subscription ~ payload:',
+        payload,
+        context,
+      );
+      return true;
+    },
+    resolve: (payload) => {
+      console.log('🚀 ~ OrdersResolver ~ @Subscription ~ payload:', payload);
+      return payload.pendingOrders.order;
     },
   })
-  @Role(['Any'])
-  readyPotatos(@AuthUser() user: User, @Args('potatoId') potatoId: number) {
-    console.log('🚀 ~ OrdersResolver ~ readyPotatos ~ user:', user);
-
-    return this.pubSub.asyncIterableIterator('hotPotatos');
+  @Role(['Owner'])
+  pendingOrders() {
+    return this.pubSub.asyncIterableIterator(NEW_PENDING_ORDER);
   }
 }
