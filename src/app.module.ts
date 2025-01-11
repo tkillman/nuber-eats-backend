@@ -71,6 +71,8 @@ import { OrderItem } from './orders/entities/order-item.entity';
       driver: ApolloDriver,
       //autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
       autoSchemaFile: true,
+      //subscribtion을 위한 설정
+      installSubscriptionHandlers: true,
       // jwtMiddleware에서 req에 user를 넣어주기 때문에 가능
       context: ({ req }) => ({ user: req['user'] }),
     }),
