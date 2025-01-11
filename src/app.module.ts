@@ -74,7 +74,15 @@ import { OrderItem } from './orders/entities/order-item.entity';
       //subscribtion을 위한 설정
       installSubscriptionHandlers: true,
       // jwtMiddleware에서 req에 user를 넣어주기 때문에 가능
-      context: ({ req }) => ({ user: req['user'] }),
+      context: ({ req, connection }) => {
+        if (req) {
+          return { user: req['user'] };
+        } else {
+          // 웹소켓 커넥션 시에는 req는 없고 connection이 있다.
+          const { context } = connection;
+          return { user: context['user'] };
+        }
+      },
     }),
     JwtModule.forRoot({
       PRIVATE_KEY: process.env.PRIVATE_KEY,

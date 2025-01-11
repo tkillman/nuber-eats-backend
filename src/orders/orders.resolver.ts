@@ -43,8 +43,17 @@ export class OrdersResolver {
     return this.ordersService.editOrder(authUser, editOrderInput);
   }
 
+  @Mutation(() => Boolean)
+  async potatoReady() {
+    // publish 할때 object의 key값이 subscript의 mutation 함수이름과 같아야 한다.
+    await pubSub.publish('hotPotatos', {
+      readyPotatos: 'Your hot potato is ready',
+    });
+    return true;
+  }
+
   @Subscription(() => String)
-  hotPotatos() {
+  readyPotatos() {
     return pubSub.asyncIterableIterator('hotPotatos');
   }
 }
