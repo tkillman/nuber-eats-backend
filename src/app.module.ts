@@ -95,8 +95,11 @@ const TOKEN_KEY = 'x-jwt';
       subscriptions: {
         'subscriptions-transport-ws': {
           onConnect: (connectionParams) => {
-            //console.log('🚀 ~ connectionParams:', connectionParams);
-            return { token: connectionParams[TOKEN_KEY] };
+            console.log('🚀 ~ connectionParams:', connectionParams);
+            const token = connectionParams[TOKEN_KEY];
+            console.log('🚀 ~ token:', token);
+
+            return { token: token };
           },
         },
       },
@@ -124,6 +127,7 @@ const TOKEN_KEY = 'x-jwt';
     AuthModule,
     RestaurantsModule,
     OrdersModule,
+    CommonModule,
   ],
   controllers: [],
   providers: [],

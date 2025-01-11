@@ -54,7 +54,9 @@ export class OrdersResolver {
 
   @Subscription(() => String)
   @Role(['Any'])
-  readyPotatos() {
+  readyPotatos(@AuthUser() user: User) {
+    console.log('🚀 ~ OrdersResolver ~ readyPotatos ~ user:', user);
+
     return pubSub.asyncIterableIterator('hotPotatos');
   }
 }
