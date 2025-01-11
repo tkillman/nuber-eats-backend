@@ -29,6 +29,8 @@ import { OrdersModule } from './orders/orders.module';
 import { Order } from './orders/entities/order.entity';
 import { OrderItem } from './orders/entities/order-item.entity';
 
+const TOKEN_KEY = 'x-jwt';
+
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -67,21 +69,45 @@ import { OrderItem } from './orders/entities/order-item.entity';
         OrderItem,
       ],
     }),
+    // GraphQLModule.forRoot<ApolloDriverConfig>({
+    //   driver: ApolloDriver,
+    //   //autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
+    //   autoSchemaFile: true,
+    //   //subscribtion을 위한 설정
+    //   installSubscriptionHandlers: true,
+    //   // jwtMiddleware에서 req에 user를 넣어주기 때문에 가능
+    //   context: ({ req, connection }) => {
+    //     if (req) {
+    //       return { user: req['user'] };
+    //     } else {
+    //       // 웹소켓 커넥션 시에는 req는 없고 connection이 있다.
+    //       const { context } = connection;
+    //       return { user: context['user'] };
+    //     }
+    //   },
+    // }),
     GraphQLModule.forRoot<ApolloDriverConfig>({
       driver: ApolloDriver,
       //autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
       autoSchemaFile: true,
       //subscribtion을 위한 설정
       installSubscriptionHandlers: true,
+      subscriptions: {
+        'subscriptions-transport-ws': {
+          onConnect: (connectionParams) => {
+            //console.log('🚀 ~ connectionParams:', connectionParams);
+            return { token: connectionParams[TOKEN_KEY] };
+          },
+        },
+      },
       // jwtMiddleware에서 req에 user를 넣어주기 때문에 가능
-      context: ({ req, connection }) => {
-        if (req) {
-          return { user: req['user'] };
-        } else {
-          // 웹소켓 커넥션 시에는 req는 없고 connection이 있다.
-          const { context } = connection;
-          return { user: context['user'] };
-        }
+      context: ({ req }) => {
+        //console.log('req.headers', req.headers);
+        const token = req.headers[TOKEN_KEY];
+        //console.log('🚀 ~ token:', token);
+        return {
+          token: token,
+        };
       },
     }),
     JwtModule.forRoot({
@@ -102,13 +128,13 @@ import { OrderItem } from './orders/entities/order-item.entity';
   controllers: [],
   providers: [],
 })
-export class AppModule implements NestModule {
-  configure(consumer: MiddlewareConsumer) {
-    consumer.apply(JwtMiddleware).forRoutes({
-      path: '/graphql',
-      method: RequestMethod.POST,
-    });
-  }
-}
 
-// export class AppModule {}
+// export class AppModule implements NestModule {
+//   configure(consumer: MiddlewareConsumer) {
+//     consumer.apply(JwtMiddleware).forRoutes({
+//       path: '/graphql',
+//       method: RequestMethod.POST,
+//     });
+//   }
+// }
+export class AppModule {}

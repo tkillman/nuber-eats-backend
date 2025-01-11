@@ -8,6 +8,7 @@ export class AuthGuard implements CanActivate {
   constructor(private readonly reflector: Reflector) {}
 
   canActivate(context: ExecutionContext) {
+    // Role decorator에서 설정한 roles를 가져온다.
     const roles = this.reflector.get<AllowedRoles[]>(
       'roles',
       context.getHandler(),
@@ -18,6 +19,7 @@ export class AuthGuard implements CanActivate {
     }
 
     const gqlContext = GqlExecutionContext.create(context).getContext();
+    console.log(gqlContext['token']);
     const user = gqlContext['user'];
     if (!user) {
       return false;

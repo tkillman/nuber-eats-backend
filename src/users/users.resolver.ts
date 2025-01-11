@@ -9,6 +9,7 @@ import { AuthUser } from 'src/auth/auth-user.decorator';
 import { UserProfileInput, UserProfileOutput } from './dtos/user-profile.dto';
 import { EditProfileInput, EditProfileOutput } from './dtos/edit-pofile.dto';
 import { VerifyEmailInput, VerifyEmailOutput } from './dtos/verifyEmail.dto';
+import { Role } from 'src/auth/role.decorator';
 
 @Resolver(() => User)
 export class UsersResolver {
@@ -49,10 +50,10 @@ export class UsersResolver {
   // }
 
   @Query(() => User)
-  @UseGuards(AuthGuard)
+  //@UseGuards(AuthGuard)
+  @Role(['Any'])
   me(@AuthUser() user: User) {
     console.log('🚀 ~ UsersResolver ~ me ~ user:', user);
-
     return user;
   }
 

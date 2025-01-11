@@ -53,6 +53,7 @@ export class OrdersResolver {
   }
 
   @Subscription(() => String)
+  @Role(['Any'])
   readyPotatos() {
     return pubSub.asyncIterableIterator('hotPotatos');
   }
