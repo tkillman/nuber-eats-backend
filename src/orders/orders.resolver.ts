@@ -47,17 +47,24 @@ export class OrdersResolver {
   }
 
   @Mutation(() => Boolean)
-  async potatoReady() {
+  async potatoReady(@Args('potatoId') potatoId: number) {
     // publish 할때 object의 key값이 subscript의 mutation 함수이름과 같아야 한다.
     await this.pubSub.publish('hotPotatos', {
-      readyPotatos: 'Your hot potato is ready',
+      readyPotatos: potatoId,
     });
     return true;
   }
 
-  @Subscription(() => String)
+  @Subscription(() => String, {
+    filter: (payload, variables, context) => {
+      console.log('🚀 ~ OrdersResolver ~ filter ~ payload', payload);
+      console.log('🚀 ~ OrdersResolver ~ filter ~ variables', variables);
+      console.log('🚀 ~ OrdersResolver ~ filter ~ context', context);
+      return variables.potatoId === payload.readyPotatos;
+    },
+  })
   @Role(['Any'])
-  readyPotatos(@AuthUser() user: User) {
+  readyPotatos(@AuthUser() user: User, @Args('potatoId') potatoId: number) {
     console.log('🚀 ~ OrdersResolver ~ readyPotatos ~ user:', user);
 
     return this.pubSub.asyncIterableIterator('hotPotatos');
