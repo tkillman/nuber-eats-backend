@@ -9,12 +9,15 @@ import { CreateOrderInput, CreateOrderOutput } from './dtos/create-order.dto';
 import { FindOrderInput, FindOrderOutput } from './dtos/order.dto';
 import { EditOrderInput, EditOrderOutput } from './dtos/edit-order.dto';
 import { PubSub } from 'graphql-subscriptions';
-
-const pubSub = new PubSub();
+import { Inject } from '@nestjs/common';
+import { PUB_SUB } from 'src/common/common.constant';
 
 @Resolver(() => Order)
 export class OrdersResolver {
-  constructor(private readonly ordersService: OrdersService) {}
+  constructor(
+    private readonly ordersService: OrdersService,
+    @Inject(PUB_SUB) private readonly pubSub: PubSub,
+  ) {}
 
   @Mutation(() => CreateOrderOutput)
   @Role(['Client'])
@@ -46,7 +49,7 @@ export class OrdersResolver {
   @Mutation(() => Boolean)
   async potatoReady() {
     // publish 할때 object의 key값이 subscript의 mutation 함수이름과 같아야 한다.
-    await pubSub.publish('hotPotatos', {
+    await this.pubSub.publish('hotPotatos', {
       readyPotatos: 'Your hot potato is ready',
     });
     return true;
@@ -57,6 +60,6 @@ export class OrdersResolver {
   readyPotatos(@AuthUser() user: User) {
     console.log('🚀 ~ OrdersResolver ~ readyPotatos ~ user:', user);
 
-    return pubSub.asyncIterableIterator('hotPotatos');
+    return this.pubSub.asyncIterableIterator('hotPotatos');
   }
 }
