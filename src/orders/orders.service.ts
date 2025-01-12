@@ -17,6 +17,7 @@ import {
   PUB_SUB,
 } from 'src/common/common.constant';
 import { PubSub } from 'graphql-subscriptions';
+import { TakeOrderOutput } from './dtos/take-order.dto';
 
 @Injectable()
 export class OrdersService {
@@ -287,6 +288,49 @@ export class OrdersService {
       return {
         ok: false,
         error: '주문을 수정할 수 없습니다.',
+      };
+    }
+  }
+
+  async takeOrder(driver: User, id: number): Promise<TakeOrderOutput> {
+    try {
+      const order = await this.orders.findOne({
+        where: {
+          id: id,
+        },
+      });
+
+      if (!order) {
+        return {
+          ok: false,
+          error: '주문을 찾을 수 없습니다.',
+        };
+      }
+
+      if (order.driver) {
+        return {
+          ok: false,
+          error: '이미 배달원이 배정되었습니다.',
+        };
+      }
+
+      await this.orders.save({
+        id: id,
+        driver,
+      });
+
+      const newOrder = { ...order, driver };
+      await this.pubSub.publish(NEW_ORDER_UPDATES, {
+        orderUpdates: newOrder,
+      });
+
+      return {
+        ok: true,
+      };
+    } catch (error) {
+      return {
+        ok: false,
+        error: error,
       };
     }
   }
