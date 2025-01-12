@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { Repository } from 'typeorm';
+import { LessThan, Repository } from 'typeorm';
 import { Payment } from './entities/payment.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import {
@@ -9,6 +9,7 @@ import {
 import { User } from 'src/users/entites/user.entity';
 import { Restaurant } from 'src/restaurants/entities/restaurants.entity';
 import { GetPaymentOutput } from './dtos/get-payment.dto';
+import { Cron, Interval, SchedulerRegistry, Timeout } from '@nestjs/schedule';
 
 @Injectable()
 export class PaymentsService {
@@ -16,6 +17,7 @@ export class PaymentsService {
     @InjectRepository(Payment) private readonly payments: Repository<Payment>,
     @InjectRepository(Restaurant)
     private readonly restaurants: Repository<Restaurant>,
+    private schedulerRegistry: SchedulerRegistry,
   ) {}
 
   async createPayment(
@@ -48,6 +50,13 @@ export class PaymentsService {
           restaurant,
         }),
       );
+
+      restaurant.isPromoted = true;
+      const date = new Date();
+      date.setDate(date.getDate() + 7);
+      restaurant.promotedUntil = date;
+
+      await this.restaurants.save(restaurant);
 
       return {
         ok: true,
@@ -83,5 +92,46 @@ export class PaymentsService {
         error: error,
       };
     }
+  }
+
+  // https://docs.nestjs.com/techniques/task-scheduling
+  // @Cron('30 * * * * *', {
+  //   name: 'myJob',
+  // })
+  // checkForPayments() {
+  //   console.log('Checking for payments... cron , 매분 30초에');
+  // }
+
+  // @Interval(5000)
+  // checkForPaymentsI() {
+  //   console.log('5초마다 실행');
+  // }
+
+  // @Timeout(10000)
+  // afterStart() {
+  //   console.log('어플리케이션이 시작되고 10초 뒤 딱 한번 실행');
+
+  //   // 이런식으로 job을 중지도 가능
+  //   this.schedulerRegistry.getCronJob('myJob').stop();
+  // }
+
+  @Interval(2000)
+  async checkPromotedRestaurants() {
+    const restaurants = await this.restaurants.find({
+      where: {
+        isPromoted: true,
+        promotedUntil: LessThan(new Date()),
+      },
+    });
+    console.log(
+      '🚀 ~ PaymentsService ~ checkPromotedRestaurants ~ restaurants:',
+      restaurants,
+    );
+
+    restaurants.forEach(async (restaurant) => {
+      restaurant.isPromoted = false;
+      restaurant.promotedUntil = null;
+      await this.restaurants.save(restaurant);
+    });
   }
 }

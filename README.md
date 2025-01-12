@@ -31,3 +31,8 @@ src\app.module.ts => graphql context에 세팅
 src\auth\role.decorator.ts => resolver에서 사용 가능한 유저 role을 명시
 
 src\auth\auth.guard.ts에 의해 (reflector 사용) 사용가능한 role 추출하고 user의 role과 비교
+
+# Cron
+
+https://docs.nestjs.com/techniques/task-scheduling
+npm install --save @nestjs/schedule
