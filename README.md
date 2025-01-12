@@ -8,6 +8,7 @@
 
 - nest g mo users
 - nest g mo orders
+- nest g mo payments
 
 # CreateDateColumn, UpdateDateColumn 두 개는 스페셜 컬럼
 
