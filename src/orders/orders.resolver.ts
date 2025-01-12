@@ -99,6 +99,17 @@ export class OrdersResolver {
         input,
         context,
       );
+
+      if (
+        orderUpdates.driverId !== context.user.id &&
+        orderUpdates.customerId !== context.user.id &&
+        orderUpdates.restaurantOwnerId !== context.user.id
+      ) {
+        // 관련된 사람만 데이터를 받을 수 있게 처리
+        // 이 부분은 orderUpdates의 asyncIterableIterator가 맺어지기 전에 방어 로직을 넣어 연결 불가시키는 방법도 좋다.
+        return false;
+      }
+
       return orderUpdates.id === input.id;
     },
   })
