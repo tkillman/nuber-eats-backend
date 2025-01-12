@@ -12,6 +12,7 @@ import { GetOrderInput, GetOrderOutput } from './dtos/get-order.dto';
 import { EditOrderInput, EditOrderOutput } from './dtos/edit-order.dto';
 import {
   NEW_COOKED_ORDER,
+  NEW_ORDER_UPDATES,
   NEW_PENDING_ORDER,
   PUB_SUB,
 } from 'src/common/common.constant';
@@ -216,7 +217,8 @@ export class OrdersService {
     try {
       const order = await this.orders.findOne({
         where: { id: editOrderInput.id },
-        relations: ['restaurant', 'items'],
+        // eager : true 옵션으로 자동으로 가져옴, lazyEager는 await로 값을 호출(await order.restaurant)하면 불러와짐
+        // relations: ['restaurant', 'items'],
       });
       console.log('🚀 ~ OrdersService ~ order:', order);
       if (!order) {
@@ -266,13 +268,18 @@ export class OrdersService {
         status: editOrderInput.status,
       });
 
+      const newOrder = { ...order, status: editOrderInput.status };
       if (editOrderInput.status === OrderStatus.Cooked) {
         await this.pubSub.publish(NEW_COOKED_ORDER, {
           cookedOrders: {
-            order: { ...order, status: editOrderInput.status },
+            order: newOrder,
           },
         });
       }
+
+      await this.pubSub.publish(NEW_ORDER_UPDATES, {
+        orderUpdates: newOrder,
+      });
 
       return { ok: true };
     } catch (error) {
