@@ -58,9 +58,9 @@ export class User extends CoreEntity {
   @OneToMany(() => Order, (order) => order.driver)
   rides: Order[];
 
-  // @Field(() => [Payment], { nullable: true })
-  // @OneToMany(() => Payment, (payment) => payment.user, { nullable: true })
-  // payments?: Payment[];
+  @Field(() => [Payment])
+  @OneToMany(() => Payment, (payment) => payment.user)
+  payments: Payment[];
 
   @BeforeInsert()
   @BeforeUpdate()

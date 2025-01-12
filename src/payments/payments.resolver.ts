@@ -19,6 +19,6 @@ export class PaymentsResolver {
     @AuthUser() owner: User,
     @Args('input') input: CreatePaymentInput,
   ): Promise<CreatePaymentOutput> {
-    return this.paymentsService.createPayment();
+    return this.paymentsService.createPayment(owner, input);
   }
 }
