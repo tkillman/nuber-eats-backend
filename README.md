@@ -36,3 +36,15 @@ src\auth\auth.guard.ts에 의해 (reflector 사용) 사용가능한 role 추출�
 
 https://docs.nestjs.com/techniques/task-scheduling
 npm install --save @nestjs/schedule
+
+# postgresql docker
+
+DB_HOST=localhost
+DB_PORT=5432
+DB_USERNAME=postgres
+DB_PASSWORD=example
+DB_DATABASE=postgres
+
+# postgresql ui
+
+localhost:8080
