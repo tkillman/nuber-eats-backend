@@ -109,6 +109,7 @@ export class ResutaurantsResolver {
   }
 
   @Mutation(() => EditRestaurantOutput)
+  @Role([UserRole.Owner])
   async editRestaurant(
     @AuthUser() authUser,
     @Args('input') editRestaurantInput: EditRestaurantInput,
