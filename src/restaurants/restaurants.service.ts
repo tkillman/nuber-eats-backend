@@ -239,6 +239,7 @@ export class RestaurantsService {
     try {
       const restaurant = await this.restaurants.findOneOrFail({
         where: { id: input.restaurantId },
+        relations: ['category'],
       });
 
       return {
