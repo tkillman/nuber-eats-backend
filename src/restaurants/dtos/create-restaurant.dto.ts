@@ -50,4 +50,7 @@ export class CreateRestaurantInputType extends PickType(
 }
 
 @ObjectType()
-export class CreateRestaurantOutput extends MutationOutput {}
+export class CreateRestaurantOutput extends MutationOutput {
+  @Field(() => Number, { nullable: true })
+  restaurantId?: number;
+}

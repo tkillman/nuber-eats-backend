@@ -37,7 +37,7 @@ export class UploadsController {
     // http://localhost:4000/images/file-1738055100602-673100375.jpg
     return {
       message: 'File uploaded successfully!',
-      filename: file.filename,
+      url: `http://localhost:4000/images/${file.filename}`,
     };
   }
 }

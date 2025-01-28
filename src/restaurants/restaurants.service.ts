@@ -81,6 +81,7 @@ export class RestaurantsService {
 
       return {
         ok: true,
+        restaurantId: newRestaurant.id,
       };
     } catch (error) {
       return {
@@ -396,7 +397,11 @@ export class RestaurantsService {
   async myRestaurants(user: User): Promise<MyRestaurantsOutput> {
     try {
       const restaurants = await this.restaurants.find({
-        where: { user },
+        where: {
+          user: {
+            id: user.id,
+          },
+        },
         relations: ['category'],
       });
 
