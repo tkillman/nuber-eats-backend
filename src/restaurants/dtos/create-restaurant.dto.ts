@@ -1,4 +1,10 @@
-import { Field, InputType, ObjectType, OmitType } from '@nestjs/graphql';
+import {
+  Field,
+  InputType,
+  ObjectType,
+  OmitType,
+  PickType,
+} from '@nestjs/graphql';
 // import { IsBoolean, IsString, Length } from 'class-validator';
 import { Restaurant } from '../entities/restaurants.entity';
 import { MutationOutput } from 'src/common/entities/output.entity';
@@ -34,9 +40,9 @@ import { MutationOutput } from 'src/common/entities/output.entity';
 // ) {}
 
 @InputType()
-export class CreateRestaurantInputType extends OmitType(
+export class CreateRestaurantInputType extends PickType(
   Restaurant,
-  ['id', 'category', 'user', 'createdAt', 'updatedAt'],
+  ['name', 'coverImage', 'address'],
   InputType,
 ) {
   @Field(() => String)

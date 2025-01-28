@@ -48,3 +48,7 @@ DB_DATABASE=postgres
 # postgresql ui
 
 localhost:8080
+
+# file upload
+
+https://docs.nestjs.com/techniques/file-upload

@@ -31,6 +31,7 @@ import { OrderItem } from './orders/entities/order-item.entity';
 import { PaymentsModule } from './payments/payments.module';
 import { Payment } from './payments/entities/payment.entity';
 import { ScheduleModule } from '@nestjs/schedule';
+import { UploadsModule } from './uploads/uploads.module';
 
 const TOKEN_KEY = 'x-jwt';
 
@@ -134,6 +135,7 @@ const TOKEN_KEY = 'x-jwt';
     CommonModule,
     PaymentsModule,
     ScheduleModule.forRoot(),
+    UploadsModule,
   ],
   controllers: [],
   providers: [],
