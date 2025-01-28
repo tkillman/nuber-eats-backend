@@ -155,6 +155,12 @@ export class ResutaurantsResolver {
   ) {
     return this.restaurantsService.searchRestaurants(searchRestaurantInput);
   }
+
+  @Query(() => MyRestaurantsOutput)
+  @Role([UserRole.Owner])
+  async myRestaurants(@AuthUser() authUser): Promise<MyRestaurantsOutput> {
+    return this.restaurantsService.myRestaurants(authUser);
+  }
 }
 
 @Resolver(() => Category)
@@ -209,11 +215,5 @@ export class DishResolver {
     @Args('input') deleteDishInput: DeleteDishInput,
   ): Promise<DeleteDishOutput> {
     return this.restaurantsService.deleteDish(authUser, deleteDishInput);
-  }
-
-  @Query(() => MyRestaurantsOutput)
-  @Role([UserRole.Owner])
-  async myRestaurants(@AuthUser() authUser): Promise<MyRestaurantsOutput> {
-    return this.restaurantsService.myRestaurants(authUser);
   }
 }
