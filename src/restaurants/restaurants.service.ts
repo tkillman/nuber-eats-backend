@@ -34,6 +34,7 @@ import { Dish } from './entities/dish.entity';
 import { EditDishInput, EditDishOutput } from './dtos/edit-dish.dto';
 import { DeleteDishInput } from './dtos/delete-dish.dto';
 import { MyRestaurantsOutput } from './dtos/my-restaurants.dto';
+import { MyRestaurantOutput } from './dtos/my-restaurant.dto';
 
 // import { UpdateRestaurantDto } from './dtos/update-restaurant.dto';
 
@@ -410,6 +411,41 @@ export class RestaurantsService {
         restaurants,
       };
     } catch (error) {
+      return {
+        ok: false,
+        error: '레스토랑을 찾을 수 없습니다.',
+      };
+    }
+  }
+
+  async myRestaurant(
+    user: User,
+    restaurantId: number,
+  ): Promise<MyRestaurantOutput> {
+    try {
+      const restaurant = await this.restaurants.findOne({
+        where: {
+          id: restaurantId,
+          user: {
+            id: user.id,
+          },
+        },
+        relations: ['category', 'menu '],
+      });
+
+      if (!restaurant) {
+        return {
+          ok: false,
+          error: '레스토랑을 찾을 수 없습니다.',
+        };
+      }
+
+      return {
+        ok: true,
+        restaurant,
+      };
+    } catch (error) {
+      console.error(error);
       return {
         ok: false,
         error: '레스토랑을 찾을 수 없습니다.',
