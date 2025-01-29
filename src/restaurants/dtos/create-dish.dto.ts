@@ -6,12 +6,14 @@ import { MutationOutput } from 'src/common/entities/output.entity';
 export class CreateDishInput extends PickType(Dish, [
   'name',
   'price',
-  'photo',
   'description',
   'options',
 ]) {
   @Field(() => Number)
   restaurantId: number;
+
+  @Field(() => String, { nullable: true })
+  photo?: string;
 }
 
 @ObjectType()

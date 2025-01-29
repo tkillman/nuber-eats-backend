@@ -430,7 +430,7 @@ export class RestaurantsService {
             id: user.id,
           },
         },
-        relations: ['category', 'menu '],
+        relations: ['category', 'menu'],
       });
 
       if (!restaurant) {

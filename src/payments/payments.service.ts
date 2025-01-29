@@ -115,7 +115,8 @@ export class PaymentsService {
   //   this.schedulerRegistry.getCronJob('myJob').stop();
   // }
 
-  @Interval(2000)
+  //@Interval(2000)
+  @Interval(20000)
   async checkPromotedRestaurants() {
     const restaurants = await this.restaurants.find({
       where: {
