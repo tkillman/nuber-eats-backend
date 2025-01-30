@@ -52,3 +52,7 @@ localhost:8080
 # file upload
 
 https://docs.nestjs.com/techniques/file-upload
+
+# ngrok
+
+npx ngrok http 4000

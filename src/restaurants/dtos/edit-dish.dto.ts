@@ -17,4 +17,7 @@ export class EditDishInput extends PartialType(
 }
 
 @ObjectType()
-export class EditDishOutput extends MutationOutput {}
+export class EditDishOutput extends MutationOutput {
+  @Field(() => Dish, { nullable: true })
+  dish?: Dish;
+}

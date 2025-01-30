@@ -242,7 +242,7 @@ export class RestaurantsService {
     try {
       const restaurant = await this.restaurants.findOneOrFail({
         where: { id: input.restaurantId },
-        relations: ['category'],
+        relations: ['category', 'menu'],
       });
 
       return {
@@ -328,6 +328,7 @@ export class RestaurantsService {
         where: { id: editDishInput.dishId },
         relations: ['restaurant'],
       });
+      console.log('here', dish);
 
       if (!dish) {
         return {
@@ -343,15 +344,29 @@ export class RestaurantsService {
         };
       }
 
-      await this.dishes.save([
-        {
-          id: editDishInput.dishId,
-          ...editDishInput,
-        },
-      ]);
+      const { createdAt, updatedAt, restaurant, ...restDish } = dish;
+
+      //dish.name = editDishInput.name;
+      const newDish = {
+        id: dish.id,
+        name: editDishInput.name,
+        price: editDishInput.price,
+        photo: editDishInput.photo,
+        description: editDishInput.description,
+        options: editDishInput.options,
+      };
+      console.log('newDish', newDish);
+      const editDish = await this.dishes.save(newDish);
+
+      console.log('editDish', editDish);
 
       return {
         ok: true,
+        dish: {
+          ...editDish,
+          createdAt: dish.createdAt,
+          updatedAt: editDish.updatedAt ?? dish.updatedAt,
+        },
       };
     } catch (error) {
       return {
@@ -430,7 +445,7 @@ export class RestaurantsService {
             id: user.id,
           },
         },
-        relations: ['category', 'menu'],
+        relations: ['category', 'menu', 'orders'],
       });
 
       if (!restaurant) {
