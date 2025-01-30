@@ -147,7 +147,7 @@ export class ResutaurantsResolver {
   }
 
   @Query(() => RestaurantOutput)
-  async Restaurant(
+  async restaurant(
     @Args('input') RestaurantInput: RestaurantInput,
   ): Promise<RestaurantOutput> {
     return this.restaurantsService.restaurantById(RestaurantInput);

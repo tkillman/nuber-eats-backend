@@ -62,21 +62,22 @@ export class OrdersService {
         }
 
         let extraPrice = 0;
-
-        for (const itemOption of item.options) {
-          const dishOption = dish.options.find(
-            (option) => option.name === itemOption.name,
-          );
-          if (dishOption) {
+        if (item.options) {
+          for (const itemOption of item.options) {
+            const dishOption = dish.options.find(
+              (option) => option.name === itemOption.name,
+            );
             if (dishOption) {
-              const dishChoice = dishOption.choices.find(
-                (choice) => choice.name === itemOption.choice,
-              );
-              if (dishChoice) {
-                if (dishChoice.extra) {
-                  // dishChoice.extra
-                  // console.log('dishChoice', dishChoice);
-                  extraPrice += dishChoice.extra;
+              if (dishOption) {
+                const dishChoice = dishOption.choices.find(
+                  (choice) => choice.name === itemOption.choice,
+                );
+                if (dishChoice) {
+                  if (dishChoice.extra) {
+                    // dishChoice.extra
+                    // console.log('dishChoice', dishChoice);
+                    extraPrice += dishChoice.extra;
+                  }
                 }
               }
             }

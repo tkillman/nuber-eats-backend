@@ -8,7 +8,7 @@ import { Order } from 'src/orders/entities/order.entity';
 @InputType('DishChoiceInputType', { isAbstract: true })
 @ObjectType()
 export class DishChoice {
-  @Field(() => String)
+  @Field(() => String, { nullable: true })
   name: string;
 
   @Field(() => Number, { nullable: true })
@@ -24,8 +24,8 @@ export class DishOption {
   @Field(() => [DishChoice], { nullable: true })
   choices?: DishChoice[];
 
-  @Field(() => Number, { nullable: true })
-  extra: number;
+  // @Field(() => Number, { nullable: true })
+  // extra: number;
 }
 
 @InputType('DishInputType', { isAbstract: true })

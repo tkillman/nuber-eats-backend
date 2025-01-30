@@ -328,7 +328,6 @@ export class RestaurantsService {
         where: { id: editDishInput.dishId },
         relations: ['restaurant'],
       });
-      console.log('here', dish);
 
       if (!dish) {
         return {
@@ -344,8 +343,6 @@ export class RestaurantsService {
         };
       }
 
-      const { createdAt, updatedAt, restaurant, ...restDish } = dish;
-
       //dish.name = editDishInput.name;
       const newDish = {
         id: dish.id,
@@ -355,10 +352,8 @@ export class RestaurantsService {
         description: editDishInput.description,
         options: editDishInput.options,
       };
-      console.log('newDish', newDish);
-      const editDish = await this.dishes.save(newDish);
 
-      console.log('editDish', editDish);
+      const editDish = await this.dishes.save(newDish);
 
       return {
         ok: true,
