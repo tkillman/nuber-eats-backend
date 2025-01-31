@@ -103,7 +103,7 @@ export class OrdersResolver {
   }
 
   @Subscription(() => Order, {
-    filter: ({ orderUpdates }, { input }, context) => {
+    filter: ({ orderUpdates }: { orderUpdates: Order }, { input }, context) => {
       console.log(
         '🚀 ~ OrdersResolver ~ @Subscription ~ filter ~ orderUpdates',
         orderUpdates,
@@ -114,13 +114,14 @@ export class OrdersResolver {
       if (
         orderUpdates.driverId !== context.user.id &&
         orderUpdates.customerId !== context.user.id &&
-        orderUpdates.restaurantOwnerId !== context.user.id
+        orderUpdates.restaurant?.userId !== context.user.id
       ) {
         // 관련된 사람만 데이터를 받을 수 있게 처리
         // 이 부분은 orderUpdates의 asyncIterableIterator가 맺어지기 전에 방어 로직을 넣어 연결 불가시키는 방법도 좋다.
+        console.log('이리 왔다는건가');
         return false;
       }
-
+      console.log('return true 해야해');
       return orderUpdates.id === input.id;
     },
   })

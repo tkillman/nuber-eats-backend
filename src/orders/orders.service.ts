@@ -279,9 +279,11 @@ export class OrdersService {
         });
       }
 
+      console.log('here come');
       await this.pubSub.publish(NEW_ORDER_UPDATES, {
         orderUpdates: newOrder,
       });
+      console.log('here come2');
 
       return { ok: true };
     } catch (error) {
