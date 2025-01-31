@@ -18,6 +18,7 @@ import {
 } from 'src/common/common.constant';
 import { OrderUpdatesInput } from './dtos/order-updates.dto';
 import { TakeOrderInput, TakeOrderOutput } from './dtos/take-order.dto';
+import { GetOrderInput, GetOrderOutput } from './dtos/get-order.dto';
 
 @Resolver(() => Order)
 export class OrdersResolver {
@@ -42,6 +43,15 @@ export class OrdersResolver {
     @Args('input') findOrderInput: FindOrderInput,
   ): Promise<FindOrderOutput> {
     return this.ordersService.getOrders(user, findOrderInput);
+  }
+
+  @Query(() => GetOrderOutput)
+  @Role(['Any'])
+  async getOrder(
+    @AuthUser() user: User,
+    @Args('input') getOrderInput: GetOrderInput,
+  ): Promise<GetOrderOutput> {
+    return this.ordersService.getOrder(user, getOrderInput);
   }
 
   @Mutation(() => EditOrderOutput)
