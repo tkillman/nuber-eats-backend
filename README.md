@@ -58,3 +58,7 @@ https://docs.nestjs.com/techniques/file-upload
 # ngrok
 
 npx ngrok http 4000
+
+# db docker 시작
+
+docker compose up -d

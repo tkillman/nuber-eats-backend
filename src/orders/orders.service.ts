@@ -261,13 +261,14 @@ export class OrdersService {
 
       if (user.role === UserRole.Delivery) {
         if (
+          order.status === OrderStatus.Cooked ||
           order.status === OrderStatus.PickUp ||
           order.status === OrderStatus.Delivered
         ) {
           canEdit = true;
         }
       }
-
+      console.log('canEdit', canEdit);
       if (!canEdit) {
         return {
           ok: false,
