@@ -46,7 +46,7 @@ describe('JwtService', () => {
   describe('sign', () => {
     it('[성공]', () => {
       const result = service.sign(1);
-      console.log('result', result);
+
       expect(typeof result).toBe('string');
       expect(jwt.sign).toHaveBeenCalledTimes(1);
       expect(jwt.sign).toHaveBeenCalledWith({ id: 1 }, options.PRIVATE_KEY);
@@ -56,7 +56,7 @@ describe('JwtService', () => {
   describe('verify', () => {
     it('[성공]', () => {
       const result = service.verify('TOKEN');
-      console.log('result', result);
+
       expect(result).toEqual({ id: 1 });
       expect(jwt.verify).toHaveBeenCalledTimes(1);
       expect(jwt.verify).toHaveBeenCalledWith('TOKEN', options.PRIVATE_KEY);

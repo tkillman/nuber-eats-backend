@@ -5,7 +5,7 @@ import {
   ObjectType,
   registerEnumType,
 } from '@nestjs/graphql';
-import { IsEnum, IsNumber } from 'class-validator';
+import { IsEnum, IsNumber, IsString } from 'class-validator';
 import { CoreEntity } from 'src/common/entities/core.entity';
 import { Dish } from 'src/restaurants/entities/dish.entity';
 import { Restaurant } from 'src/restaurants/entities/restaurants.entity';
@@ -84,4 +84,19 @@ export class Order extends CoreEntity {
   @Field(() => OrderStatus)
   @IsEnum(OrderStatus)
   status: OrderStatus;
+
+  @Field(() => String)
+  @Column({ default: '' })
+  @IsString()
+  address: string;
+
+  @Field(() => Float)
+  @Column('float', { default: 0 })
+  @IsNumber()
+  lat: number;
+
+  @Field(() => Number)
+  @Column('float', { default: 0 })
+  @IsNumber()
+  lng: number;
 }

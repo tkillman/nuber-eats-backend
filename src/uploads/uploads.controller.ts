@@ -32,8 +32,6 @@ export class UploadsController {
     }),
   )
   uploadFile(@UploadedFile() file) {
-    console.log(file.filename);
-
     // http://localhost:4000/images/file-1738055100602-673100375.jpg
     return {
       message: 'File uploaded successfully!',

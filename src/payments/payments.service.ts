@@ -79,7 +79,6 @@ export class PaymentsService {
           },
         },
       });
-      console.log('🚀 ~ PaymentsService ~ getPayments ~ payments:', payments);
 
       return {
         ok: true,

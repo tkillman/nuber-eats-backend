@@ -1,5 +1,7 @@
 # Nuber
 
+npm i -g @nestjs/cli
+
 # nest -v <br/>
 
 - 10.4.9

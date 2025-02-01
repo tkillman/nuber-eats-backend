@@ -60,7 +60,6 @@ describe('AppController (e2e)', () => {
         })
         .expect(200)
         .expect((res) => {
-          console.log('🚀 ~ .expect ~ res:', res.body.data);
           expect(res.body.data.createUser.ok).toEqual(true);
           expect(res.body.data.createUser.error).toEqual(null);
         });
@@ -111,7 +110,6 @@ describe('AppController (e2e)', () => {
         })
         .expect(200)
         .expect((res) => {
-          console.log('🚀 ~ .expect ~ res.body.data', res.body.data);
           expect(res.body.data.login.ok).toEqual(true);
           expect(res.body.data.login.error).toEqual(null);
           expect(res.body.data.login.token).toEqual(expect.any(String));
@@ -138,7 +136,6 @@ describe('AppController (e2e)', () => {
         })
         .expect(200)
         .expect((res) => {
-          console.log('🚀 ~ .expect ~ res.body.data', res.body.data);
           expect(res.body.data.login.ok).toEqual(false);
           expect(res.body.data.login.error).toEqual(expect.any(String));
           expect(res.body.data.login.token).toEqual(null);
@@ -163,7 +160,6 @@ describe('AppController (e2e)', () => {
         })
         .expect(200)
         .expect((res) => {
-          console.log('🚀 ~ .expect ~ res.body.data', res.body.data);
           expect(res.body.data.login.ok).toEqual(false);
           expect(res.body.data.login.error).toEqual(expect.any(String));
           expect(res.body.data.login.token).toEqual(null);
@@ -199,7 +195,6 @@ describe('AppController (e2e)', () => {
         })
         .expect(200)
         .expect((res) => {
-          console.log('🚀 ~ .expect ~ res.body.data', res.body.data);
           expect(res.body.data.userProfile.ok).toEqual(true);
           expect(res.body.data.userProfile.error).toEqual(null);
           expect(res.body.data.userProfile.user.email).toEqual(testUser.email);
@@ -226,7 +221,6 @@ describe('AppController (e2e)', () => {
         })
         .expect(200)
         .expect((res) => {
-          console.log('🚀 ~ .expect ~ res.body.data', res.body.data);
           expect(res.body.data.userProfile.ok).toEqual(false);
           expect(res.body.data.userProfile.error).toEqual(expect.any(String));
           expect(res.body.data.userProfile.user).toEqual(null);

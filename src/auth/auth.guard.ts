@@ -25,9 +25,8 @@ export class AuthGuard implements CanActivate {
     }
 
     const gqlContext = GqlExecutionContext.create(context).getContext();
-    console.log(gqlContext['token']);
+
     const token = gqlContext['token'];
-    console.log('🚀 ~ AuthGuard ~ canActivate ~ token:', token);
 
     if (token) {
       try {
@@ -41,7 +40,6 @@ export class AuthGuard implements CanActivate {
           if (!user) {
             return false;
           }
-          console.log('유저 세팅 전, ', user);
           gqlContext['user'] = user; // req.user에 user를 넣어준다.
 
           if (roles.includes('Any')) {

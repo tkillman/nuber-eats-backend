@@ -18,6 +18,7 @@ import {
 } from 'src/common/common.constant';
 import { PubSub } from 'graphql-subscriptions';
 import { TakeOrderOutput } from './dtos/take-order.dto';
+import { NaverService } from 'src/naver/naver.service';
 
 @Injectable()
 export class OrdersService {
@@ -29,6 +30,7 @@ export class OrdersService {
     private readonly orderItems: Repository<OrderItem>,
     @InjectRepository(Dish) private readonly dishes: Repository<Dish>,
     @Inject(PUB_SUB) private readonly pubSub: PubSub,
+    private readonly naverService: NaverService,
   ) {}
 
   async createOrder(
@@ -93,12 +95,19 @@ export class OrdersService {
         orderItems.push(orderItem);
       }
 
+      const orderAddress = await this.naverService.getGeoCode(
+        createOrderInput.orderAddress,
+      );
+
       const order = await this.orders.save(
         this.orders.create({
           customer: user,
           restaurant: restaurant,
           items: orderItems,
           total: totalPrice,
+          lng: orderAddress.x,
+          lat: orderAddress.y,
+          address: createOrderInput.orderAddress,
         }),
       );
       console.log('메시지 보내기', order);
@@ -108,6 +117,7 @@ export class OrdersService {
 
       return {
         ok: true,
+        order,
       };
     } catch (error) {
       return {
@@ -222,14 +232,14 @@ export class OrdersService {
         // eager : true 옵션으로 자동으로 가져옴, lazyEager는 await로 값을 호출(await order.restaurant)하면 불러와짐
         // relations: ['restaurant', 'items'],
       });
-      console.log('🚀 ~ OrdersService ~ order:', order);
+
       if (!order) {
         return {
           ok: false,
           error: '주문을 찾을 수 없습니다.',
         };
       }
-      console.log('user', user.role, 'order', order.status);
+
       if (!this.canSeeOrder(user, order)) {
         return {
           ok: false,
@@ -279,11 +289,9 @@ export class OrdersService {
         });
       }
 
-      console.log('here come');
       await this.pubSub.publish(NEW_ORDER_UPDATES, {
         orderUpdates: newOrder,
       });
-      console.log('here come2');
 
       return { ok: true };
     } catch (error) {

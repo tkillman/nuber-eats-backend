@@ -17,9 +17,15 @@ export class CreateOrderInput {
   @Field(() => Number)
   restaurantId: number;
 
+  @Field(() => String)
+  orderAddress: string;
+
   @Field(() => [CreateOrderItemInput])
   items: CreateOrderItemInput[];
 }
 
 @ObjectType()
-export class CreateOrderOutput extends MutationOutput {}
+export class CreateOrderOutput extends MutationOutput {
+  @Field(() => Order, { nullable: true })
+  order?: Order;
+}

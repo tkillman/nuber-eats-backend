@@ -10,6 +10,7 @@ import { RestaurantsService } from './restaurants.service';
 import { Category } from './entities/category.entity';
 import { CategoryRepository } from './repositories/category.repository';
 import { Dish } from './entities/dish.entity';
+import { NaverService } from 'src/naver/naver.service';
 
 @Module({
   imports: [TypeOrmModule.forFeature([Restaurant, CategoryRepository, Dish])],
@@ -19,6 +20,7 @@ import { Dish } from './entities/dish.entity';
     DishResolver,
     RestaurantsService,
     CategoryRepository,
+    NaverService,
   ],
 })
 export class RestaurantsModule {}

@@ -35,6 +35,7 @@ import { EditDishInput, EditDishOutput } from './dtos/edit-dish.dto';
 import { DeleteDishInput } from './dtos/delete-dish.dto';
 import { MyRestaurantsOutput } from './dtos/my-restaurants.dto';
 import { MyRestaurantOutput } from './dtos/my-restaurant.dto';
+import { NaverService } from 'src/naver/naver.service';
 
 // import { UpdateRestaurantDto } from './dtos/update-restaurant.dto';
 
@@ -47,6 +48,7 @@ export class RestaurantsService {
     private readonly categories: CategoryRepository,
     @InjectRepository(Dish)
     private readonly dishes: Repository<Dish>,
+    private readonly naverService: NaverService,
   ) {}
 
   // getAll(): Promise<Restaurant[]> {
@@ -72,12 +74,20 @@ export class RestaurantsService {
       const newRestaurant = this.restaurants.create(createRestaurantInput);
       newRestaurant.user = authUser;
 
+      // 주소좌표 구하기
+      const { x, y } = await this.naverService.getGeoCode(
+        createRestaurantInput.address,
+      );
+
+      newRestaurant.lng = +x;
+      newRestaurant.lat = +y;
+
       const category = await this.categories.getOrCreateCategory(
         createRestaurantInput.categoryName,
       );
 
       newRestaurant.category = category;
-
+      console.log('aaaaaaaaaaaa', newRestaurant);
       await this.restaurants.save(newRestaurant);
 
       return {
@@ -111,9 +121,15 @@ export class RestaurantsService {
       let category: Category = null;
 
       if (editRestaurantInput.categoryName) {
-        console.log('this.categories');
         category = await this.categories.getOrCreateCategory(
           editRestaurantInput.categoryName,
+        );
+      }
+
+      let defaultLngLat = null;
+      if (editRestaurantInput.address) {
+        defaultLngLat = await this.naverService.getGeoCode(
+          editRestaurantInput.address,
         );
       }
 
@@ -122,6 +138,7 @@ export class RestaurantsService {
           id: editRestaurantInput.restaurantId,
           ...editRestaurantInput,
           ...(category && { category }),
+          ...(defaultLngLat && { lng: defaultLngLat.x, lat: defaultLngLat.y }),
         },
       ]);
 

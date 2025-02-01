@@ -32,6 +32,7 @@ import { PaymentsModule } from './payments/payments.module';
 import { Payment } from './payments/entities/payment.entity';
 import { ScheduleModule } from '@nestjs/schedule';
 import { UploadsModule } from './uploads/uploads.module';
+import { NaverModule } from './naver/naver.module';
 
 const TOKEN_KEY = 'x-jwt';
 
@@ -100,9 +101,7 @@ const TOKEN_KEY = 'x-jwt';
       subscriptions: {
         'subscriptions-transport-ws': {
           onConnect: (connectionParams) => {
-            console.log('🚀 ~ connectionParams:', connectionParams);
             const token = connectionParams[TOKEN_KEY];
-            console.log('🚀 ~ token:', token);
 
             return { token: token };
           },
@@ -136,6 +135,7 @@ const TOKEN_KEY = 'x-jwt';
     PaymentsModule,
     ScheduleModule.forRoot(),
     UploadsModule,
+    NaverModule,
   ],
   controllers: [],
   providers: [],

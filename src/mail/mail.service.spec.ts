@@ -44,7 +44,6 @@ describe('MailService', () => {
       */
       // service.sendEmail = jest.fn();
       jest.spyOn(service, 'sendEmail').mockImplementation(async () => {
-        console.log('i love u');
         return true;
       });
 

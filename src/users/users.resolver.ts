@@ -53,7 +53,6 @@ export class UsersResolver {
   //@UseGuards(AuthGuard)
   @Role(['Any'])
   me(@AuthUser() user: User) {
-    console.log('🚀 ~ UsersResolver ~ me ~ user:', user);
     return user;
   }
 
@@ -78,8 +77,6 @@ export class UsersResolver {
         ok: true,
       };
     } catch (error) {
-      console.log('🚀 ~ UsersResolver ~ error:', error);
-
       return {
         ok: false,
         error: error,
