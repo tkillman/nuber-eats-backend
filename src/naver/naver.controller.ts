@@ -1,16 +1,13 @@
-import { Body, Controller, Get, Post, Req } from '@nestjs/common';
-import axios from 'axios';
+import { Controller, Get, Req } from '@nestjs/common';
+
 import { Request } from 'express';
 import { NaverService } from './naver.service';
 
-const xNcpApigwApiKeyId = 'kdcml5umif';
-const xNcpApigwApiKey = 'tv94fYV8Ce33yKHYCGvlRsiq2kixVUbqt8TqGiWI';
-
-@Controller('')
+@Controller('/map-direction/v1')
 export class NaverController {
   constructor(private readonly naverService: NaverService) {}
 
-  @Get('/map-direction/v1/driving')
+  @Get('/driving')
   async direction(@Req() req: Request) {
     console.log('req', req.query);
 

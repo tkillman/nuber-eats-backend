@@ -1,16 +1,13 @@
 import { Injectable } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import axios from 'axios';
 
-const xNcpApigwApiKeyId = 'kdcml5umif';
-const xNcpApigwApiKey = 'tv94fYV8Ce33yKHYCGvlRsiq2kixVUbqt8TqGiWI';
+// const xNcpApigwApiKeyId = 'kdcml5umif';
+// const xNcpApigwApiKey = 'tv94fYV8Ce33yKHYCGvlRsiq2kixVUbqt8TqGiWI';
 
 @Injectable()
 export class NaverService {
-  constructor() {}
-
-  getNaver() {
-    return 'hi';
-  }
+  constructor(private readonly configService: ConfigService) {}
 
   // start : 출발지 좌표 ex) 127.1058342,37.3595316
   // goal : 도착지 좌표 ex) 127.1058342,37.3595316
@@ -24,8 +21,10 @@ export class NaverService {
 
     const response = await axios.get(url, {
       headers: {
-        'x-ncp-apigw-api-key-id': xNcpApigwApiKeyId,
-        'x-ncp-apigw-api-key': xNcpApigwApiKey,
+        'x-ncp-apigw-api-key-id': this.configService.get(
+          'X_NCP_APIGW_API_KEY_ID',
+        ),
+        'x-ncp-apigw-api-key': this.configService.get('X_NCP_APIGW_API_KEY'),
       },
     });
 
@@ -50,8 +49,10 @@ export class NaverService {
 
       const response = await axios.get(url, {
         headers: {
-          'x-ncp-apigw-api-key-id': xNcpApigwApiKeyId,
-          'x-ncp-apigw-api-key': xNcpApigwApiKey,
+          'x-ncp-apigw-api-key-id': this.configService.get(
+            'X_NCP_APIGW_API_KEY_ID',
+          ),
+          'x-ncp-apigw-api-key': this.configService.get('X_NCP_APIGW_API_KEY'),
         },
       });
 

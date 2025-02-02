@@ -53,6 +53,8 @@ const TOKEN_KEY = 'x-jwt';
         MAILGUN_API_KEY: Joi.string().required(),
         MAILGUN_DOMAIN: Joi.string().required(),
         MAILGUN_FROM_EMAIL: Joi.string().required(),
+        X_NCP_APIGW_API_KEY_ID: Joi.string().required(),
+        X_NCP_APIGW_API_KEY: Joi.string().required(),
       }),
     }),
     TypeOrmModule.forRoot({
