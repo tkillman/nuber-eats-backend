@@ -73,8 +73,8 @@ const TOKEN_KEY = 'x-jwt';
             database: process.env.DB_DATABASE,
           }),
       // synchronize가 true이면 디비를 자동으로 생성하므로 주의!!
-      //synchronize: process.env.NODE_ENV !== 'production',
-      synchronize: true,
+      synchronize: process.env.NODE_ENV !== 'production',
+      //synchronize: true,
       logging: process.env.NODE_ENV === 'dev',
       entities: [
         User,
