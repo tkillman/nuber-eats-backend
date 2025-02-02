@@ -62,3 +62,7 @@ npx ngrok http 4000
 # db docker 시작
 
 docker compose up -d
+
+# 배포
+
+git push heroku master
