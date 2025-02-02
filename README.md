@@ -66,3 +66,10 @@ docker compose up -d
 # 배포
 
 git push heroku master
+
+# Db ssl 배포 오류
+
+heroku config에 설정
+
+https://stackoverflow.com/questions/61097695/self-signed-certificate-error-during-query-the-heroku-hosted-postgres-database
+PGSSLMODE=no-verify
