@@ -52,7 +52,7 @@ export class UsersService {
       return { ok: true };
     } catch (error) {
       // 에러 발생
-      //console.error(error?.message);
+      console.error(error?.message);
       return { ok: false, error: '계정을 생성할 수 없습니다.' };
     }
   }

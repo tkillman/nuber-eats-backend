@@ -73,3 +73,7 @@ heroku config에 설정
 
 https://stackoverflow.com/questions/61097695/self-signed-certificate-error-during-query-the-heroku-hosted-postgres-database
 PGSSLMODE=no-verify
+
+# 배포된 도메인
+
+https://whispering-reef-81218-a36f3aadbc60.herokuapp.com
