@@ -72,7 +72,8 @@ const TOKEN_KEY = 'x-jwt';
             password: process.env.DB_PASSWORD,
             database: process.env.DB_DATABASE,
           }),
-      synchronize: process.env.NODE_ENV !== 'production',
+      // synchronize가 true이면 디비를 자동으로 생성하므로 주의!!
+      //synchronize: process.env.NODE_ENV !== 'production',
       logging: process.env.NODE_ENV === 'dev',
       entities: [
         User,
