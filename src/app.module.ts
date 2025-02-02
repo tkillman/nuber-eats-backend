@@ -103,6 +103,7 @@ const TOKEN_KEY = 'x-jwt';
     //   },
     // }),
     GraphQLModule.forRoot<ApolloDriverConfig>({
+      playground: process.env.NODE_ENV !== 'production',
       driver: ApolloDriver,
       //autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
       autoSchemaFile: true,
